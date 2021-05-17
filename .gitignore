@@ -130,3 +130,7 @@ dmypy.json
 
 # IDE-stuff
 .vscode/
+
+# image data
+*.png
+*.jpg
