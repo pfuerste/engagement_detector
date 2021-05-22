@@ -51,6 +51,10 @@ def hough_lines_cutter(img):
     plt.show()
 
 
+def extract_face(img):
+    
+
+
 if __name__ == "__main__":
     img = cv2.imread('input/data/zoom_ui2.png')
     line_img = np.zeros_like(img)
