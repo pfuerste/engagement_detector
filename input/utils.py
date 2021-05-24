@@ -3,7 +3,7 @@ import cv2
 from matplotlib import pyplot as plt
 
 
-def cut_img(img, bbs):
+def crop_bbs(img, bbs):
     """Returns n cropped bbs from an image and a list of n bb-coordinates.
 
     Args:
