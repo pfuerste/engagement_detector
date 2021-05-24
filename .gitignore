@@ -131,6 +131,7 @@ dmypy.json
 # IDE-stuff
 .vscode/
 
-# image data
+# image and video data
 *.png
 *.jpg
+*.mp4
