@@ -1,42 +1,81 @@
 import cv2 as cv
 import numpy as np
+import matplotlib.pyplot as plt
+import face_recognition
 
 
-def detectAndDisplay(frame):
+def cascade_extract(frame, classifier_a, classifier_b=None):
+    """Given a haar_cascade_classifier, returns a list of BB-coordinates of each face in an image.
+
+    Args:
+        frame (np.array): image to search for faces in.
+        classifier_a (cv.CascadeClassifier): classifier.
+        classifier_b (cv.CascadeClassifier, optional): second classifier incase the first one finds no faces.
+
+    Returns:
+        tuple: list of n lists as [top, right, bottom, left] for n found faces.
+
+    """
     frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     frame_gray = cv.equalizeHist(frame_gray)
-    # -- Detect faces
-    faces = face_cascade.detectMultiScale(frame_gray)
-    for (x, y, w, h) in faces:
-        center = (x + w//2, y + h//2)
-        frame = cv.ellipse(frame, center, (w//2, h//2),
-                           0, 0, 360, (255, 0, 255), 4)
-        faceROI = frame_gray[y:y+h, x:x+w]
-        # -- In each face, detect eyes
-        eyes = eyes_cascade.detectMultiScale(faceROI)
-        for (x2, y2, w2, h2) in eyes:
-            eye_center = (x + x2 + w2//2, y + y2 + h2//2)
-            radius = int(round((w2 + h2)*0.25))
-            frame = cv.circle(frame, eye_center, radius, (255, 0, 0), 4)
-    cv.imshow('Capture - Face detection', frame)
-    cv.waitKey(0)
+
+    faces = classifier_a.detectMultiScale(frame_gray)
+    if len(faces) == 0 and classifier_b is not None:
+        faces = classifier_b.detectMultiScale(frame_gray)
+    plt.imshow(frame)
+    # OpenCVs coordinates are like numpys
+    for i, (x, y, w, h) in enumerate(faces):
+        bot = y + w
+        top = y
+        left = x
+        right = x + h
+        faces[i] = (top, right, bot, left)
+
+    return faces
+
+
+def get_cascade_models(face_cascade_path="models/haarcascade_frontalface_alt.xml",
+                       face_cascade2_path="models/haarcascade_frontalface_alt2.xml"):
+    """Returns 2 classifiers for automatic face detection.
+
+    Args:
+        face_cascade_path (str, optional): Path to first model xml.
+        Defaults to "models/haarcascade_frontalface_alt.xml".
+        face_cascade2_path (str, optional): Path to second model xml.
+        Defaults to "models/haarcascade_frontalface_alt2.xml".
+
+    Returns:
+        tuple: 2 cv.CascadeClassifier
+    """
+    face_cascade = cv.CascadeClassifier()
+    face_cascade2 = cv.CascadeClassifier()
+    if not face_cascade.load(cv.samples.findFile(face_cascade_path)):
+        print("--(!)Error loading face cascade")
+        exit(0)
+    if not face_cascade2.load(cv.samples.findFile(face_cascade2_path)):
+        print("--(!)Error loading eyes cascade")
+        exit(0)
+
+    return face_cascade, face_cascade2
+
+
+def face_recog_extract(img):
+    """Returns a list of BB-coordinates of each face in an image.
+
+    Args:
+        img (np.array): image to search for faces in.
+
+    Returns:
+        tuple: list of n lists as [top, right, bottom, left] for n found faces.
+    """
+    face_locations = face_recognition.face_locations(img)
+
+    return face_locations
 
 
 if __name__ == "__main__":
-    face_cascade_path = "models/haarcascade_frontalface_alt.xml"
-    eyes_cascade_path = "models/haarcascade_eye_tree_eyeglasses.xml"
-
-    face_cascade = cv.CascadeClassifier()
-    eyes_cascade = cv.CascadeClassifier()
-    # -- 1. Load the cascades
-    if not face_cascade.load(cv.samples.findFile(face_cascade_path)):
-        print('--(!)Error loading face cascade')
-        exit(0)
-    if not eyes_cascade.load(cv.samples.findFile(eyes_cascade_path)):
-        print('--(!)Error loading eyes cascade')
-        exit(0)
-
     imgs = ["data/zoom_ui.jpg", "data/hard_face0.jpg",
             "data/hard_face1.jpg", "data/hard_face2.jpg"]
+    clas1, clas2 = get_cascade_models()
     for img in imgs:
-        detectAndDisplay(cv.imread(img))
+        cascade_extract(cv.imread(img), clas1, clas2)
