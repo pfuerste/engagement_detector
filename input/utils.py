@@ -3,6 +3,23 @@ import cv2
 from matplotlib import pyplot as plt
 
 
+def cut_img(img, bbs):
+    """Returns n cropped bbs from an image and a list of n bb-coordinates.
+
+    Args:
+        img (np.array): image.
+        bbs (list): list of n tuples of ints of the form (top, right, bot, left)
+
+    Returns:
+        list: list of np.arrays
+    """
+    imgs = list()
+    for bb in bbs:
+        imgs.append(img[bb[0]:bb[2], bb[3]:bb[1]])
+
+    return imgs
+
+
 def get_angle(p1, p2):
     """get angle in degree on line between two points
 
@@ -22,7 +39,7 @@ def hough_lines_cutter(img):
         in an image.
 
     Args:
-        img (cv color img): image
+        img (np.array): image
     """
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
@@ -49,10 +66,6 @@ def hough_lines_cutter(img):
     plt.subplot(133), plt.imshow(line_img, cmap='gray')
     plt.title('Line Image'), plt.xticks([]), plt.yticks([])
     plt.show()
-
-
-def extract_face(img):
-    
 
 
 if __name__ == "__main__":
