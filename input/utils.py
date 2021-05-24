@@ -30,7 +30,7 @@ def get_angle(p1, p2):
     Returns:
         float: degree of line
     """
-    rad = np.arctan2(p1[1]-p2[1], p1[0]-p2[0])
+    rad = np.arctan2(p1[1] - p2[1], p1[0] - p2[0])
     return np.rad2deg(rad)
 
 
@@ -47,7 +47,7 @@ def hough_lines_cutter(img):
     minLineLength = 100
     maxLineGap = 10
     # TODO: find better params for lineextractor
-    lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=100,
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100,
                             lines=np.array([]), minLineLength=minLineLength, maxLineGap=80)
 
     a, b, c = lines.shape
@@ -56,8 +56,8 @@ def hough_lines_cutter(img):
                         (lines[i][0][2], lines[i][0][3]))
         if deg not in [0, 90, 180]:
             continue
-        cv2.line(line_img, (lines[i][0][0], lines[i][0][1]), (lines[i]
-                                                              [0][2], lines[i][0][3]), (0, 0, 255), 3, cv2.LINE_AA)
+        cv2.line(line_img, (lines[i][0][0], lines[i][0][1]),
+                 (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 3, cv2.LINE_AA)
 
     plt.subplot(131), plt.imshow(gray, cmap="gray")
     plt.title('Original Image'), plt.xticks([]), plt.yticks([])
