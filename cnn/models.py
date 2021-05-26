@@ -5,8 +5,15 @@ import tensorflow.keras.optimizers as optimizers
 import tensorflow.keras.metrics as metrics
 
 
-def get_model():
-    input_shape = (32, 32, 1)
+def get_model(input_shape=(32, 32, 1)):
+    """Returns a compiled model.
+
+    Args:
+        input_shape (tuple, optional): input shape of single images. Defaults to (32, 32, 1).
+
+    Returns:
+        tf.keras.models.Sequential: compiled model
+    """
     model = Sequential()
 
     model.add(Conv2D(
@@ -84,9 +91,10 @@ def get_model():
 
     optimizer = optimizers.Adam()
     model.compile(optimizer=optimizer,
-                  loss=losses.BinaryCrossentropy,
-                  metrics=metrics.Accuracy)
+                  loss=losses.BinaryCrossentropy(),
+                  metrics=metrics.Accuracy())
     print(model.summary())
+    return model
 
 
 if __name__ == "__main__":
