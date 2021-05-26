@@ -85,9 +85,9 @@ def viz_faces(img, face_locations):
 if __name__ == "__main__":
     imgs = ["data/zoom_ui.jpg", "data/hard_face0.jpg",
             "data/hard_face1.jpg", "data/hard_face2.jpg"]
-    # clas1, clas2 = get_cascade_models()
+    clas1, clas2 = get_cascade_models()
     for img in imgs:
         img = cv.imread(img)
-        faces = face_recog_extract(img)
-        # cascade_extract(cv.imread(img), clas1, clas2)
+        # faces = face_recog_extract(img)
+        faces = cascade_extract(cv.imread(img), clas1, clas2)
         viz_faces(img, faces)
