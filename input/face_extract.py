@@ -22,7 +22,6 @@ def cascade_extract(frame, classifier_a, classifier_b=None):
     faces = classifier_a.detectMultiScale(frame_gray)
     if len(faces) == 0 and classifier_b is not None:
         faces = classifier_b.detectMultiScale(frame_gray)
-    plt.imshow(frame)
     # OpenCVs coordinates are like numpys
     for i, (x, y, w, h) in enumerate(faces):
         bot = y + w
@@ -73,9 +72,22 @@ def face_recog_extract(img):
     return face_locations
 
 
+def viz_faces(img, face_locations):
+    plt.imshow(img)
+    for (top, right, bot, left) in face_locations:
+        plt.plot(right, bot, 'bo')
+        plt.plot(right, top, 'bo')
+        plt.plot(left, top, 'bo')
+        plt.plot(left, bot, 'bo')
+    plt.show()
+
+
 if __name__ == "__main__":
     imgs = ["data/zoom_ui.jpg", "data/hard_face0.jpg",
             "data/hard_face1.jpg", "data/hard_face2.jpg"]
-    clas1, clas2 = get_cascade_models()
+    # clas1, clas2 = get_cascade_models()
     for img in imgs:
-        cascade_extract(cv.imread(img), clas1, clas2)
+        img = cv.imread(img)
+        faces = face_recog_extract(img)
+        # cascade_extract(cv.imread(img), clas1, clas2)
+        viz_faces(img, faces)
