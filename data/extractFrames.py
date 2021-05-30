@@ -4,6 +4,7 @@
 # The script must in the a same directory as the Dataset Folder.
 import os
 import subprocess
+import yaml
 
 
 def split_video(video_file, image_name_prefix, destination_path):
@@ -12,16 +13,21 @@ def split_video(video_file, image_name_prefix, destination_path):
 
 
 if __name__ == "__main__":
-    dataset = os.listdir('DataSet/')
+    data_root = yaml.safe_load(open("data/config.yml"))["data_root"]
+    data_path = os.path.join(data_root, 'DataSet/')
+    dataset = os.listdir(data_path)
 
     for ttv in dataset:
-        users = os.listdir('DataSet/' + ttv + '/')
+        users = os.listdir(data_path + ttv + '/')
         for user in users:
-            currUser = os.listdir('DataSet/' + ttv + '/' + user + '/')
+            currUser = os.listdir(data_path + ttv + '/' + user + '/')
             for extract in currUser:
-                clip = os.listdir('DataSet/' + ttv + '/' + user + '/' + extract + '/')[0]
+                clip = os.listdir(data_path + ttv + '/' + user + '/' + extract + '/')[0]
                 print(clip[:-4])
-                path = os.path.abspath('.') + '/DataSet/' + ttv + '/' + user + '/' + extract + '/'
+                path = data_path + ttv + '/' + user + '/' + extract + '/'
+                # print("clip: ", clip)
+                # print(clip[:-4])
+                # print(path)
                 split_video(clip, clip[:-4], path)
 
     print("================================================================================\n")
