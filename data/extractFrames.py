@@ -22,13 +22,12 @@ if __name__ == "__main__":
         for user in users:
             currUser = os.listdir(data_path + ttv + '/' + user + '/')
             for extract in currUser:
+                if len(os.listdir(data_path + ttv + '/' + user + '/' + extract + '/')) != 1:
+                    continue
                 clip = os.listdir(data_path + ttv + '/' + user + '/' + extract + '/')[0]
-                print(clip[:-4])
                 path = data_path + ttv + '/' + user + '/' + extract + '/'
-                # print("clip: ", clip)
-                # print(clip[:-4])
-                # print(path)
-                split_video(clip, clip[:-4], path)
+                if not os.path.isfile(path):
+                    split_video(clip, clip[:-4], path)
 
     print("================================================================================\n")
     print("Frame Extraction Successful")
