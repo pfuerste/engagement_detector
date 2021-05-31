@@ -12,7 +12,7 @@ def write_img_csv(subset):
 
     Raises:
         FileExistsError: if image label csv already exists
-    """    
+    """
     data_root = yaml.safe_load(open("data/config.yml"))["data_root"]
     subdir = os.path.join(data_root, "DataSet", subset)
 
@@ -31,7 +31,7 @@ def write_img_csv(subset):
             label_str = str(row["Boredom"]) + ", " + str(row["Engagement"]) + ", " + \
                 str(row["Confusion"]) + ", " + str(row["Frustration "])
             img_files = [file for file in os.listdir(os.path.join(subdir, subj_dir, clip_id)) if file.endswith(".jpg")]
-            
+
             for img_file in img_files:
                 csv.write(os.path.join(subj_dir, clip_id, img_file) + ", " + label_str + " \n")
 
@@ -42,7 +42,6 @@ def get_datagen():
     Returns:
         keras.preprocessing.image.ImageDataGenerator
     """
-    # Image augmentation params
     datagen = ImageDataGenerator(
         rescale=1 / 255.0,
         rotation_range=20,
