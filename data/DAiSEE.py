@@ -4,36 +4,11 @@ from keras.preprocessing.image import ImageDataGenerator
 import pandas as pd
 
 
-def write_img_csv(subset):
-    """Write image labels to csv from video labels.
-
-    Args:
-        subset (str): "Train", "Test", or "Validation"
-
-    Raises:
-        FileExistsError: if image label csv already exists
-    """
+def get_dataframe(subset):
     data_root = yaml.safe_load(open("data/config.yml"))["data_root"]
-    subdir = os.path.join(data_root, "DataSet", subset)
-
-    avi_csv_path = os.path.join(data_root, "Labels", subset + "Labels.csv")
-    img_csv_path = os.path.join(data_root, "Labels", subset + "ImgLabels.csv")
-    if os.path.isfile(img_csv_path):
-        raise FileExistsError(
-            f"""Labels for image files are already processed
-            please check and delete if wanted. File Location: {img_csv_path}""")
-    avi_df = pd.read_csv(avi_csv_path)
-    with open(img_csv_path, "w") as csv:
-        csv.write("ClipID, Boredom, Engagement, Confusion, Frustration \n")
-        for _, row in avi_df.iterrows():
-            clip_id = row["ClipID"].replace(".avi", "").replace(".mp4", "")
-            subj_dir = clip_id[:6]
-            label_str = str(row["Boredom"]) + ", " + str(row["Engagement"]) + ", " + \
-                str(row["Confusion"]) + ", " + str(row["Frustration "])
-            img_files = [file for file in os.listdir(os.path.join(subdir, subj_dir, clip_id)) if file.endswith(".jpg")]
-
-            for img_file in img_files:
-                csv.write(os.path.join(subj_dir, clip_id, img_file) + ", " + label_str + " \n")
+    label_dir = os.path.join(data_root, "Labels")
+    csv_path = os.path.join(label_dir, subset + "ImgLabels.csv")
+    return pd.read_csv(csv_path)
 
 
 def get_datagen():
@@ -61,20 +36,20 @@ def get_flowing_datagen(datagen, df, subset):
     Args:
         datagen (keras.preprocessing.image.ImageDataGenerator)
         df (pandas.DataFrame): Image Dataframe of subset
-        subset (str): "Training" or "Validation"
+        subset (str): "Train" or "Validation"
 
     Returns:
         keras.preprocessing.image.ImageDataGenerator
     """
-    data_root = yaml.safe_load(open("data/config.yml"))["data_root"]
+    root = yaml.safe_load(open("config.yml"))["root"]
+    data_root = yaml.safe_load(open(os.path.join(root, "data/config.yml")))["data_root"]
     subdir = os.path.join(data_root, "DataSet", subset)
-    print(subdir)
     subset = "training" if subset == "Train" else "validation"
     datagen = datagen.flow_from_dataframe(
         dataframe=df,
         directory=subdir,
         x_col="ClipID",
-        y_col=["Boredom", "Engagement", "Confusion", "Frustration "],
+        y_col=list(df.columns.drop("ClipID")),
         subset=subset.lower(),
         batch_size=32,
         seed=42,
@@ -85,10 +60,14 @@ def get_flowing_datagen(datagen, df, subset):
 
 
 if __name__ == "__main__":
-    write_img_csv("Test")
-    # subset = "Train"
-    # df = get_dataframe(subset)
-    # print(df.head())
+    # write_img_csv("Test")
+    # write_img_csv("Train")
+    # write_img_csv("Validation")
+
+    subset = "Validation"
+    df = get_dataframe(subset)
+    print(df.head())
+    print(list(df.columns.drop("ClipID")))
     # print(df.columns)
-    # datagen = get_datagen()
-    # flowing = get_flowing_datagen(datagen, df, subset)
+    datagen = get_datagen()
+    flowing = get_flowing_datagen(datagen, df, subset)
