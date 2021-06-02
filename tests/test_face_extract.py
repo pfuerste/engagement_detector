@@ -15,14 +15,14 @@ def ugly_imports():
 
 
 # Kein richtiger Test, aber wie soll ich das testen?
-def test_it():
-    img_path = "input/data/zoom_ui.jpg"
-    img = cv2.imread(img_path)
-    bbs = face_recog_extract(img_path)
-    crops = crop_bbs(img, bbs)
-    for crop in crops:
-        plt.imshow(crop)
-        plt.show()
+# def test_it():
+#     img_path = "input/data/zoom_ui.jpg"
+#     img = cv2.imread(img_path)
+#     bbs = face_recog_extract(img_path)
+#     crops = crop_bbs(img, bbs)
+#     for crop in crops:
+#         plt.imshow(crop)
+#         plt.show()
 
 
 if __name__ == "__main__":
