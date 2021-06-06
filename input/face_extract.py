@@ -22,7 +22,6 @@ def cascade_extract(frame, classifier_a, classifier_b=None):
     faces = classifier_a.detectMultiScale(frame_gray)
     if len(faces) == 0 and classifier_b is not None:
         faces = classifier_b.detectMultiScale(frame_gray)
-    plt.imshow(frame)
     # OpenCVs coordinates are like numpys
     for i, (x, y, w, h) in enumerate(faces):
         bot = y + w
