@@ -91,8 +91,8 @@ def get_model(input_shape=(32, 32, 1)):
 
     optimizer = optimizers.Adam()
     model.compile(optimizer=optimizer,
-                  loss=losses.BinaryCrossentropy(),
-                  metrics=["MAE"])
+                  loss=losses.MeanSquaredError(),
+                  metrics=[metrics.MeanSquaredError()])
     print(model.summary())
     return model
 
