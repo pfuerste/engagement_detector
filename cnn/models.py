@@ -90,6 +90,7 @@ def get_model(input_shape=(32, 32, 1)):
         activation="softmax"))
 
     optimizer = optimizers.Adam()
+    # TODO wrong losses?
     model.compile(optimizer=optimizer,
                   loss=losses.MeanSquaredError(),
                   metrics=[metrics.MeanSquaredError()])

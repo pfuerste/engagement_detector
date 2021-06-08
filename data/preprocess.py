@@ -88,13 +88,14 @@ def create_face_data(subset):
 
     start = time.perf_counter()
     random.shuffle(img_paths)
-    img_paths = tqdm.tqdm(img_paths)
-    #Parallel(n_jobs=-1)(delayed(extract_and_copy)(i) for i in img_paths)
-    for i in img_paths:
-        extract_and_copy(i)
+    cut_off = int(0.2*len(img_paths))
+    img_paths = tqdm.tqdm(img_paths[:cut_off])
+    Parallel(n_jobs=-1)(delayed(extract_and_copy)(i) for i in img_paths)
+    # for i in img_paths:
+    #     extract_and_copy(i)
     end = time.perf_counter()
     print(f"preocessing faces took {end-start} time(s).")
 
 
 if __name__ == "__main__":
-    create_face_data("dev")
+    create_face_data("Train")
