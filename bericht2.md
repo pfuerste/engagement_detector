@@ -10,7 +10,7 @@ Die Implementierung des zuvor recherchierten Modells wurde beendet.
 ### Datenvorverarbeitung
 Hier mussten einige Probleme mit dem dem Datenset beiliegenden Skript behoben werden, das Frames aus Videos extrahiert. 
 Aus den so gewonnenen Frames wurden mittels der im letzten Meilenstein implementierten Gesichtserkennung Gesichter ausgeschnitten und in 32x32 Pixel
-großen Bildern gespeichert. 
+großen Bildern gespeichert. Dieser Part der Vorverarbeitung auf einzelnen Bildern wurde mittels des *joblib*-Pakets auf mehreren CPUs durch Multiprocessing parallelisiert.
 Des weiteren mussten zu den so gewonnenen Gesichtsbildern Label im .csv-Format generiert werden, welche die Label aus den 
 Videos darstellten und von *Keras* nutzbar sind.
 
