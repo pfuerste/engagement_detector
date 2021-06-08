@@ -1,4 +1,4 @@
-## Meilensteinbericht 1 (zum 8.6.21)
+## Meilensteinbericht 2 (zum 8.6.21)
 
 Das Vorgehen bis zum ersten Meilenstein verlief soweit weitestgehend nach Plan, 
 es gab allerdings einige unvorhergesehene Schwierigkeiten im Bereich der Datenvorverarbeitung,
@@ -19,8 +19,12 @@ Es wurde ein Zugang zu Rechnern der CV-Gruppe angefragt, welche über eine GPU v
 Auf das dortige Netzwerk wurden mittels *scp*-Befehl die Daten geladen.
 
 ### Gesichtsmerkmale
+Erkannte Gesichter des ersten Screenshots werden ausgeschnitten und in einem Ordner abgespeichert(Eindeutiger Name; hochzählend).
+Per face_recognition werden die Gesichter in "128-dimension" codiert und in einer Liste "known_face_encodings" abgespeichert. Die auf den nachfolgenden Screenshots gefundenen Gesichter werden per face_recognition_compare_faces mit der Liste der bisher bekannten Gesichter abgeglichen. Falls ein neues Gesicht auftaucht, wird dieses im Referenzordner abgespeichert. Ansonsten bekommt die Bilddatei des ausgeschnittenen Gesichtes den entsprechenden Namen und wird für das Modell vorbereitet.
 
 ### Andere Eingabemethoden
+Bisher keine weitere Möglichkeit des direkten Abgreifens der Kamera gefunden. Für kleinere Seminargruppen bekommt man meist alle Kameras auf eine Seite, weshalb die Aufnahme eines Fensters alle nötigen Kameras abgreifen kann.
+Zumindest unter windows wäre eine Aufnahme von Fenstern im Hintergrund möglich, wodurch der Nutzer(bspw. der Dozent) andere Fenster im Vordergrund offen haben könnte(bspw. Präsentation).
 
 ### Verzögerungen 
 Durch Probleme beim Upload und Unklarheit bezüglich der Bedienung der Rechner der CV-Gruppe sowie mehr benötigter Vorverarbeitung als erwartet
