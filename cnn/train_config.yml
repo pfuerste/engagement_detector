@@ -1,0 +1,5 @@
+root: C:\Users\phili\_Documents\SS21\AWP\engagement_detector
+epochs: 2
+steps: 100
+val_steps: 20
+batch_size: 32
