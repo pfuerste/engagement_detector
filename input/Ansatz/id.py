@@ -12,7 +12,8 @@ os.chdir(r'E:\Users\Alexander\Desktop\Bilder\temp')
 # TODO Docstrings, siehe readme oder mein Code
 # TODO paths aus config.yml lesen, siehe andere Ordner
 # TODO Ordner (z.B.) /faces aus yml lesen (root/data/faces?), das sollte nicht einfach in cwd sein
-# TODO /faces dort generieren falls nicht schon da (os.mkdir)
+# TODO /faces dort generieren falls nicht schon da (os.mkdir). Am besten mit noch einem Parameter für nen aussagekräftigeren Namen als faces,
+# um für Vorlesungen einzelne Ordner zu generieren, z.B. /InfoA_faces o.ä.
 # TODO visualisierung rausnehmen oder optional machen, brauch man später nicht mehr
 # TODO Weitere Modularisierung: encoding sollten in einer Funktion im  Speicher gehalten werden, damit währrend einer
 # Vorlesung nicht dauernd Files gelesen & geschrieben werden müssen. Nach
