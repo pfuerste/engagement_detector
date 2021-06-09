@@ -8,6 +8,19 @@ imagePath = r"E:\Users\Alexander\Desktop\Bilder\testung.png"
 os.chdir(r'E:\Users\Alexander\Desktop\Bilder\temp')
 
 
+# TODO Rechtschreibfehler, so läufts nicht
+# TODO Docstrings, siehe readme oder mein Code
+# TODO paths aus config.yml lesen, siehe andere Ordner
+# TODO Ordner (z.B.) /faces aus yml lesen (root/data/faces?), das sollte nicht einfach in cwd sein
+# TODO /faces dort generieren falls nicht schon da (os.mkdir)
+# TODO visualisierung rausnehmen oder optional machen, brauch man später nicht mehr
+# TODO Weitere Modularisierung: encoding sollten in einer Funktion im  Speicher gehalten werden, damit währrend einer
+# Vorlesung nicht dauernd Files gelesen & geschrieben werden müssen. Nach
+# der Vorlesung werden alle encodings gespeichert um bei der nächsten VL
+# zu vergleichen wer wer ist.
+# TODO die anderen Dateien löschen?
+
+
 def get_encoded_faces():
     encoded = {}
     for dirpath, dnames, fnames in os.walk("./faces"):
