@@ -72,9 +72,22 @@ def face_recog_extract(img):
     return face_locations
 
 
+def viz_faces(img, face_locations):
+    plt.imshow(img)
+    for (top, right, bot, left) in face_locations:
+        plt.plot(right, bot, 'bo')
+        plt.plot(right, top, 'bo')
+        plt.plot(left, top, 'bo')
+        plt.plot(left, bot, 'bo')
+    plt.show()
+
+
 if __name__ == "__main__":
     imgs = ["data/zoom_ui.jpg", "data/hard_face0.jpg",
             "data/hard_face1.jpg", "data/hard_face2.jpg"]
     clas1, clas2 = get_cascade_models()
     for img in imgs:
-        cascade_extract(cv.imread(img), clas1, clas2)
+        img = cv.imread(img)
+        # faces = face_recog_extract(img)
+        faces = cascade_extract(cv.imread(img), clas1, clas2)
+        viz_faces(img, faces)
