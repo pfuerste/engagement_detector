@@ -5,7 +5,8 @@ import tensorflow.keras.optimizers as optimizers
 import tensorflow.keras.metrics as metrics
 
 
-def get_model(input_shape=(32, 32, 1)):
+# TODO Greyscale needs to be converted, just stay at rgb?
+def get_model(input_shape=(32, 32, 3)):
     """Returns a compiled model.
 
     Args:

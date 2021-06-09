@@ -41,9 +41,10 @@ def get_flowing_datagen(datagen, df, subset):
     Returns:
         keras.preprocessing.image.ImageDataGenerator
     """
+    # TODO findet zu wenig Files?
     root = yaml.safe_load(open("config.yml"))["root"]
     data_root = yaml.safe_load(open(os.path.join(root, "data/config.yml")))["data_root"]
-    subdir = os.path.join(data_root, "DataSet", subset)
+    subdir = os.path.join(data_root, "DataSet", "Face"+subset)
     subset = "training" if subset == "Train" else "validation"
     datagen = datagen.flow_from_dataframe(
         dataframe=df,
