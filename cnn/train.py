@@ -1,30 +1,62 @@
 import os
 import sys
 import yaml
+import tensorflow as tf
 
 
-def train():
+class PredictionCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs={}):
+        y_pred = self.model.predict(self.validation_data[0])
+        print('prediction: {} at epoch: {}'.format(y_pred, epoch))
+
+
+def train(weights=None):
     sys.path.insert(0, os.path.abspath('..'))
     sys.path.insert(0, os.path.abspath('.'))
     from models import get_model
     import data.DAiSEE as dai
 
+    print(tf.config.list_physical_devices())
+
     root = yaml.safe_load(open("config.yml"))["root"]
-    data_root = yaml.safe_load(open(os.path.join(root, "data/config.yml")))["data_root"]
+    model_dir = os.path.join(root, "cnn", "models")
     params = yaml.safe_load(open(os.path.join(root, "cnn/train_config.yml")))
+    print("Got Model Params.")
 
     train_df = dai.get_dataframe("Train")
     val_df = dai.get_dataframe("Validation")
     train_datagen = dai.get_flowing_datagen(dai.get_datagen(), train_df, "Train")
     val_datagen = dai.get_flowing_datagen(dai.get_datagen(), val_df, "Validation")
+    print("Got Dataframes.")
+
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=os.path.join(model_dir, "checkpoints.hdf5"),
+        save_weights_only=True,
+        monitor='val_mean_squared_error',
+        mode='auto',
+        save_best_only=True)
+    callbacks = [model_checkpoint_callback,
+                 PredictionCallback()]
 
     model = get_model()
+    print("Got Model, starting to train.")
     model.fit(x=train_datagen,
               steps_per_epoch=params["steps"],
               validation_data=val_datagen,
               validation_steps=params["val_steps"],
-              epochs=params["epochs"])
+              epochs=params["epochs"],
+              callbacks=callbacks)
+    model.save(os.path.join(model_dir, "final_model.h5"))
 
 
 if __name__ == "__main__":
+    # print(tf.config.list_physical_devices())
+    # tf.debugging.set_log_device_placement(True)
+
+    # # Create some tensors
+    # a = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    # b = tf.constant([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+    # c = tf.matmul(a, b)
+
+    # print(c)
     train()
