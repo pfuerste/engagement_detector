@@ -50,7 +50,7 @@ def save_encodings(list_of_face_encodings, lecture_name):
     """
 
     with open('{}.dat'.format(lecture_name), 'xb') as f:
-        pickle.dump(list_of_face_imgs, f)
+        pickle.dump(list_of_face_encodings, f)
     pass
 
 
