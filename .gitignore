@@ -138,4 +138,6 @@ dmypy.json
 *.avi
 cnn/train_config.yml
 .gitignore
-*.yml
+*yml
+*h5
+*hdf5
