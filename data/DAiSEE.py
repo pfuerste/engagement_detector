@@ -8,7 +8,10 @@ def get_dataframe(subset):
     data_root = yaml.safe_load(open("data/config.yml"))["data_root"]
     label_dir = os.path.join(data_root, "Labels")
     csv_path = os.path.join(label_dir, subset + "ImgLabels.csv")
-    return pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path)
+    # TODO OS-Abfrage
+    df["ClipID"] = df["ClipID"].apply(lambda x: x.replace("\\", "/"))
+    return df
 
 
 def get_datagen():
@@ -43,7 +46,7 @@ def get_flowing_datagen(datagen, df, subset):
     """
     root = yaml.safe_load(open("config.yml"))["root"]
     data_root = yaml.safe_load(open(os.path.join(root, "data/config.yml")))["data_root"]
-    subdir = os.path.join(data_root, "DataSet", subset)
+    subdir = os.path.join(data_root, "DataSet", "Face" + subset)
     subset = "training" if subset == "Train" else "validation"
     datagen = datagen.flow_from_dataframe(
         dataframe=df,
@@ -64,10 +67,20 @@ if __name__ == "__main__":
     # write_img_csv("Train")
     # write_img_csv("Validation")
 
-    subset = "Validation"
+    subset = "Test"
     df = get_dataframe(subset)
-    print(df.head())
-    print(list(df.columns.drop("ClipID")))
+    # print(df.head())
+    # print(list(df.columns.drop("ClipID")))
     # print(df.columns)
     datagen = get_datagen()
     flowing = get_flowing_datagen(datagen, df, subset)
+    #print(flowing._targets)
+    print(flowing.target_size)
+
+    for data, label in flowing:
+        print(data)
+        print(label)
+        # print(len(label))
+        # for l in label:
+        #     print(l.shape)
+        break

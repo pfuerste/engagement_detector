@@ -1,15 +1,15 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, BatchNormalization, Activation, Dropout, MaxPool2D, GlobalAveragePooling2D
+from tensorflow.keras.layers import Dense, Reshape, Conv2D, BatchNormalization, Activation, Dropout, MaxPool2D, GlobalAveragePooling2D
 import tensorflow.keras.losses as losses
 import tensorflow.keras.optimizers as optimizers
 import tensorflow.keras.metrics as metrics
 
 
-def get_model(input_shape=(32, 32, 1)):
+def get_model(input_shape=(32, 32, 3)):
     """Returns a compiled model.
 
     Args:
-        input_shape (tuple, optional): input shape of single images. Defaults to (32, 32, 1).
+        input_shape (tuple, optional): input shape of single images. Defaults to (32, 32, 3).
 
     Returns:
         tf.keras.models.Sequential: compiled model
@@ -85,14 +85,21 @@ def get_model(input_shape=(32, 32, 1)):
         kernel_size=(1, 1),
     ))
     model.add(GlobalAveragePooling2D())
+    #model.add(Flatten())
+
     model.add(Dense(
         units=4,
-        activation="softmax"))
-
+        activation="linear"))
+    # model.add(Reshape((None, 4)))
     optimizer = optimizers.Adam()
+
+    # model.compile(optimizer=optimizer,
+    #               loss=losses.MeanSquaredError(),
+    #               metrics=[metrics.MeanSquaredError()])
+    #loss = losses.SparseCategoricalCrossentropy()
+    loss = losses.MeanSquaredError()
     model.compile(optimizer=optimizer,
-                  loss=losses.BinaryCrossentropy(),
-                  metrics=["MAE"])
+                  loss=loss, metrics=[metrics.MeanSquaredError()])
     print(model.summary())
     return model
 
