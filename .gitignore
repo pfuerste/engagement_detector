@@ -136,3 +136,6 @@ dmypy.json
 *.jpg
 *.mp4
 *.avi
+cnn/train_config.yml
+.gitignore
+*.yml
