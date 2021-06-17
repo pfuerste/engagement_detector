@@ -24,6 +24,7 @@ def sparsify(arr, ax=2, keep=0.25):
 def get_current_session_path(sessions_root, name):
     """Returns session_root/name/x with x being an identifier of the current time.
        Call at the beginning of a session.
+
     Args:
         sessions_root (str): path for data of all data
         name (str): lecture name, will be subdir in sessions_root
@@ -74,6 +75,15 @@ def get_sorted_session_paths(sessions_root, name):
 
 
 def save_session(sessions_root, name, ids, scores, keep=1.0):
+    """Save ids & scores to disk.
+
+    Args:
+        sessions_root (str): path for data of all data
+        name (str): lecture name, will be subdir in sessions_root
+        ids (np.array): array of face encodings
+        scores (np.array): array of engagement scores
+        keep (float, optional): ratio of how much of score's last dim to keep. Defaults to 1.0.
+    """
     if scores.ndim == 3 and keep != 1.0:
         scores = sparsify(scores, keep=keep)
     dir = get_latest_session_path(sessions_root, name)
@@ -83,9 +93,7 @@ def save_session(sessions_root, name, ids, scores, keep=1.0):
 
 def load_all_sessions(sessions_root, name):
     """Loads ALL previous sessions of the lecture into memory.
-       Memory consumption: N*(4*sizeof(float)+T*sizeof(float))
-       ~ N*(64B+T*8B). Assuming 50 Participants and saving two times
-       each minute amounts to 50*(64B+180*8B) ~73MB. #TODO
+       Memory consumption in Byte for one session: N*(128*sizeof(float)+T*4*sizeof(float))
 
     Args:
         sessions_root (str): path for data of all data
@@ -97,6 +105,22 @@ def load_all_sessions(sessions_root, name):
     session_paths = get_sorted_session_paths(sessions_root, name)
     ids = [np.load(os.path.join(x, "ids.npy")) for x in session_paths]
     scores = [np.load(os.path.join(x, "scores.npy")) for x in session_paths]
+    return ids, scores
+
+
+def load_last_session(sessions_root, name):
+    """Loads most recent sessions of the lecture into memory.
+
+    Args:
+        sessions_root (str): path for data of all data
+        name (str): lecture name, will be subdir in sessions_root
+
+    Returns:
+        tuple: ids and scores
+    """
+    session_path = get_latest_session_path(sessions_root, name)
+    ids = np.load(os.path.join(session_path, "ids.npy"))
+    scores = np.load(os.path.join(session_path, "scores.npy"))
     return ids, scores
 
 
