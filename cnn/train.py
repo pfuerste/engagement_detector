@@ -29,6 +29,9 @@ def train(old_model=None):
 
     print(tf.config.list_physical_devices())
 
+    # tf.config.threading.set_intra_op_parallelism_threads(10)
+    # tf.config.threading.set_inter_op_parallelism_threads(10)
+
     root = yaml.safe_load(open("config.yml"))["root"]
     model_dir = os.path.join(root, "cnn", "models")
     log_dir = os.path.join(root, "logs")
@@ -51,8 +54,8 @@ def train(old_model=None):
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=os.path.join(model_dir, "checkpoints.hdf5"),
         save_weights_only=True,
-        monitor='val_sparse_categrical_cross_entropy',
-        mode='min',
+        monitor='val_Engagement_accuracy',
+        mode='max',
         save_best_only=True)
     tb_callback = keras.callbacks.TensorBoard(log_dir=log_dir,
                                               histogram_freq=0, write_graph=True, write_images=False)
@@ -69,7 +72,8 @@ def train(old_model=None):
                         validation_data=train_datagen,
                         validation_steps=params["val_steps"],
                         epochs=params["epochs"],
-                        callbacks=callbacks)
+                        callbacks=callbacks,
+                        use_multiprocessing=True)
     # model.fit(x=train_datagen,
     #           steps_per_epoch=params["steps"],
     #           validation_data=val_datagen,
