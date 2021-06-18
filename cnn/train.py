@@ -24,40 +24,49 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 def train(old_model=None):
     sys.path.insert(0, os.path.abspath('..'))
     sys.path.insert(0, os.path.abspath('.'))
-    from models import get_model
+    from models import get_model, get_func_model
     import data.DAiSEE as dai
 
     print(tf.config.list_physical_devices())
 
     root = yaml.safe_load(open("config.yml"))["root"]
     model_dir = os.path.join(root, "cnn", "models")
+    log_dir = os.path.join(root, "logs")
     params = yaml.safe_load(open(os.path.join(root, "cnn/train_config.yml")))
     print("Got Model Params.")
 
     if old_model:
         model = keras.models.load_model(old_model)
     else:
-        model = get_model()
+        model = get_func_model()
 
     train_df = dai.get_dataframe("Train")
     val_df = dai.get_dataframe("Validation")
     train_datagen = dai.get_flowing_datagen(dai.get_datagen(), train_df, "Train")
     val_datagen = dai.get_flowing_datagen(dai.get_datagen(), val_df, "Validation")
+    train_datagen = dai.reshaped_gen(train_datagen, 1)
+    val_datagen = dai.reshaped_gen(val_datagen, 1)
     print("Got Dataframes.")
 
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=os.path.join(model_dir, "checkpoints.hdf5"),
         save_weights_only=True,
-        monitor='val_mean_squared_error',
+        monitor='val_sparse_categrical_cross_entropy',
         mode='min',
         save_best_only=True)
+    tb_callback = keras.callbacks.TensorBoard(log_dir=log_dir,
+                                              histogram_freq=0, write_graph=True, write_images=False)
     callbacks = [model_checkpoint_callback,
-                 ]
+                 tb_callback]
+    # for _, y in train_datagen:
+    #     print(y.shape)
+    #     break
+    # tf.compat.v1.experimental.output_all_intermediates(True)
 
     print("Got Model, starting to train.")
     model.fit_generator(generator=train_datagen,
                         steps_per_epoch=params["steps"],
-                        validation_data=val_datagen,
+                        validation_data=train_datagen,
                         validation_steps=params["val_steps"],
                         epochs=params["epochs"],
                         callbacks=callbacks)

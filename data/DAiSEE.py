@@ -53,7 +53,7 @@ def get_flowing_datagen(datagen, df, subset):
         dataframe=df,
         directory=subdir,
         x_col="ClipID",
-        y_col=list(df.columns.drop("ClipID")),
+        y_col=df.columns.drop("ClipID"),
         subset=subset.lower(),
         batch_size=32,
         seed=42,
@@ -61,6 +61,14 @@ def get_flowing_datagen(datagen, df, subset):
         class_mode="raw",
         target_size=(32, 32))
     return datagen
+
+
+def reshaped_gen(generator, batch_size):
+    for x, y in generator:
+        #y = [0,0,0,0]
+        y = [y[:, 0], y[:, 1], y[:, 2], y[:, 3]]
+        #y = y.reshape((batch_size, 4))
+        yield x, y
 
 
 if __name__ == "__main__":
@@ -79,9 +87,12 @@ if __name__ == "__main__":
     print(flowing.target_size)
 
     for data, label in flowing:
-        print(data)
-        print(label)
+        print(label.shape)
         # print(len(label))
         # for l in label:
         #     print(l.shape)
+        break
+
+    for data, label in reshaped_gen(flowing, 32):
+        print(label.shape)
         break

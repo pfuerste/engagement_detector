@@ -116,7 +116,7 @@ def get_func_model(input_shape=(32, 32, 3)):
     """
     from tensorflow.python.framework.ops import disable_eager_execution
     disable_eager_execution()
-    # tf.compat.v1.experimental.output_all_intermediates(True)
+    tf.compat.v1.experimental.output_all_intermediates(True)
 
     inp = tf.keras.Input(shape=input_shape)
     x = Conv2D(filters=192,
