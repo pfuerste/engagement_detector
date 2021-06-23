@@ -1,5 +1,6 @@
 root: C:\Users\phili\_Documents\SS21\AWP\engagement_detector
-epochs: 2
-steps: 100
-val_steps: 20
+data_root: C:\Users\phili\Documents\Datasets\DAiSEE
+epochs: 11
+steps: 2
+val_steps: 1
 batch_size: 32
