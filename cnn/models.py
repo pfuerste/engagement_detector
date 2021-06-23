@@ -106,7 +106,7 @@ def get_model(input_shape=(32, 32, 3)):
 
 
 def get_func_model(input_shape=(32, 32, 3)):
-    """Returns a compiled model.
+    """Returns a compiled model with multiple output branches.
 
     Args:
         input_shape (tuple, optional): input shape of single images. Defaults to (32, 32, 3).
@@ -269,14 +269,11 @@ def get_func_model(input_shape=(32, 32, 3)):
     optimizer = optimizers.Adam()
     model = Model(inputs=inp, outputs=[b5, e5, c5, f5])
 
-    # loss = losses.SparseCategoricalCrossentropy()
     model.compile(optimizer=optimizer,
                   loss={"Boredom": 'sparse_categorical_crossentropy',
                         "Engagement": 'sparse_categorical_crossentropy',
-                        #"Engagement2": 'sparse_categorical_crossentropy',
-
-                        "Frustration": 'sparse_categorical_crossentropy',
-                        "Confusion": 'sparse_categorical_crossentropy'},
+                        "Confusion": 'sparse_categorical_crossentropy',
+                        "Frustration": 'sparse_categorical_crossentropy'},
                   metrics=['sparse_categorical_crossentropy', 'accuracy'])
     print(model.summary())
     return model
@@ -285,3 +282,4 @@ def get_func_model(input_shape=(32, 32, 3)):
 if __name__ == "__main__":
     # get_model()
     get_func_model()
+    get_func_model((64, 64, 3))

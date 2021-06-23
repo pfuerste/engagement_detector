@@ -51,17 +51,13 @@ def train(old_model=None):
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=os.path.join(model_dir, "checkpoints.hdf5"),
         save_weights_only=True,
-        monitor='val_sparse_categrical_cross_entropy',
-        mode='min',
+        monitor='val_Engagement_accuracy',
+        mode='auto',
         save_best_only=True)
     tb_callback = keras.callbacks.TensorBoard(log_dir=log_dir,
                                               histogram_freq=0, write_graph=True, write_images=False)
     callbacks = [model_checkpoint_callback,
                  tb_callback]
-    # for _, y in train_datagen:
-    #     print(y.shape)
-    #     break
-    # tf.compat.v1.experimental.output_all_intermediates(True)
 
     print("Got Model, starting to train.")
     model.fit_generator(generator=train_datagen,
@@ -70,23 +66,8 @@ def train(old_model=None):
                         validation_steps=params["val_steps"],
                         epochs=params["epochs"],
                         callbacks=callbacks)
-    # model.fit(x=train_datagen,
-    #           steps_per_epoch=params["steps"],
-    #           validation_data=val_datagen,
-    #           validation_steps=params["val_steps"],
-    #           epochs=params["epochs"],
-    #           callbacks=callbacks)
-    #model.save(os.path.join(model_dir, "final_model.h5"))
+    model.save(os.path.join(model_dir, "final_model.h5"))
 
 
 if __name__ == "__main__":
-    # print(tf.config.list_physical_devices())
-    # tf.debugging.set_log_device_placement(True)
-
-    # # Create some tensors
-    # a = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
-    # b = tf.constant([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
-    # c = tf.matmul(a, b)
-
-    # print(c)
     train()
