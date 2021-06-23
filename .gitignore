@@ -145,3 +145,6 @@ cnn/train_config.yml
 bericht1.html
 bericht1.md
 Meilensteinbericht 1 (zum 25.5.21).pdf
+
+logs/events*
+logs/plugins*
