@@ -86,10 +86,12 @@ def create_face_data(subset, size=(32, 32)):
     random.shuffle(img_paths)
     cut_off = int(0.2*len(img_paths))
     img_paths = tqdm.tqdm(img_paths[:cut_off])
-    Parallel(n_jobs=-1)(delayed(extract_and_copy, size)(i) for i in img_paths)
+    Parallel(n_jobs=-1)(delayed(extract_and_copy)(i, size) for i in img_paths)
     end = time.perf_counter()
-    print(f"preocessing faces took {end-start} time(s).")
+    print(f"processing faces for {subset} took {end-start} time(s).")
 
 
 if __name__ == "__main__":
+    create_face_data("Validation", (64, 64))
     create_face_data("Train", (64, 64))
+    create_face_data("Test", (64, 64))
