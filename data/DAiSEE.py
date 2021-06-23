@@ -9,7 +9,6 @@ def get_dataframe(subset):
     label_dir = os.path.join(data_root, "Labels")
     csv_path = os.path.join(label_dir, subset + "ImgLabels.csv")
     df = pd.read_csv(csv_path)
-    # TODO OS-Abfrage
     df["ClipID"] = df["ClipID"].apply(lambda x: x.replace("\\", "/"))
     return df
 
@@ -33,7 +32,7 @@ def get_datagen():
     return datagen
 
 
-def get_flowing_datagen(datagen, df, subset):
+def get_flowing_datagen(datagen, df, subset, size=None):
     """Returns keras datagen which reads data from pandas dataframe.
 
     Args:
@@ -44,11 +43,12 @@ def get_flowing_datagen(datagen, df, subset):
     Returns:
         keras.preprocessing.image.ImageDataGenerator
     """
-    # TODO findet zu wenig Files?
     root = yaml.safe_load(open("config.yml"))["root"]
     data_root = yaml.safe_load(open(os.path.join(root, "data/config.yml")))["data_root"]
-    subdir = os.path.join(data_root, "DataSet", "Face" + subset)
+    subdir = os.path.join(data_root, "DataSet", "Face" + subset + str(size[0]))
     subset = "training" if subset == "Train" else "validation"
+    shuffle = True if subset == "training" else False
+    target_size = (32, 32) if not size else size
     datagen = datagen.flow_from_dataframe(
         dataframe=df,
         directory=subdir,
@@ -57,17 +57,15 @@ def get_flowing_datagen(datagen, df, subset):
         subset=subset.lower(),
         batch_size=32,
         seed=42,
-        shuffle=True,
+        shuffle=shuffle,
         class_mode="raw",
-        target_size=(32, 32))
+        target_size=target_size)
     return datagen
 
 
-def reshaped_gen(generator, batch_size):
+def reshaped_gen(generator):
     for x, y in generator:
-        #y = [0,0,0,0]
         y = [y[:, 0], y[:, 1], y[:, 2], y[:, 3]]
-        #y = y.reshape((batch_size, 4))
         yield x, y
 
 
@@ -78,21 +76,14 @@ if __name__ == "__main__":
 
     subset = "Test"
     df = get_dataframe(subset)
-    # print(df.head())
-    # print(list(df.columns.drop("ClipID")))
-    # print(df.columns)
     datagen = get_datagen()
-    flowing = get_flowing_datagen(datagen, df, subset)
-    #print(flowing._targets)
+    flowing = get_flowing_datagen(datagen, df, subset, (64, 64))
     print(flowing.target_size)
 
     for data, label in flowing:
         print(label.shape)
-        # print(len(label))
-        # for l in label:
-        #     print(l.shape)
         break
 
-    for data, label in reshaped_gen(flowing, 32):
+    for data, label in reshaped_gen(flowing):
         print(label.shape)
         break

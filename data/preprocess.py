@@ -43,7 +43,7 @@ def write_img_csv(subset):
                 csv.write(os.path.join(subj_dir, clip_id, img_file) + ", " + label_str + " \n")
 
 
-def create_face_data(subset):
+def create_face_data(subset, size=(32, 32)):
     sys.path.insert(0, os.path.abspath('..'))
     sys.path.insert(0, os.path.abspath('.'))
     import input.face_extract as fe
@@ -62,40 +62,34 @@ def create_face_data(subset):
             img_files = [os.path.join(vid_dir, file) for file in os.listdir(vid_dir) if file.endswith(".jpg")]
             img_paths.extend(img_files)
 
-    def extract_and_copy(img_path):
-        # for old_path in tqdm.tqdm(img_paths):
+    def extract_and_copy(img_path, size):
         split = img_path.split(os.sep + subset + os.sep)
         split2 = split[1].split(os.sep)
         split3 = split2[0] + os.sep + split2[1]
-        if not os.path.isdir(os.path.join(split[0], "Face" + subset, split3)):
-            os.makedirs(os.path.join(split[0], "Face" + subset, split3))
-            # os.mkdir(os.path.join(split[0], "Face" + subset))
+        if not os.path.isdir(os.path.join(split[0], "Face" + subset + str(size[0]), split3)):
+            os.makedirs(os.path.join(split[0], "Face" + subset + str(size[0]), split3))
 
-        new_path = os.path.join(split[0], "Face" + subset, split[1])
+        new_path = os.path.join(split[0], "Face" + subset + str(size[0]), split[1])
         if os.path.isfile(new_path):
             return 0
-            # continue
         img = cv.imread(img_path)
         bb = fe.face_recog_extract(img)
         face_img = utils.crop_bbs(img, bb)
         # Ignore ambigous images, keras generator should skip them too
         if len(face_img) != 1:
             return 0
-            # continue
         # Only one face per image in train set
-        face_img = cv.resize(face_img[0], (32, 32))
+        face_img = cv.resize(face_img[0], size)
         cv.imwrite(new_path, face_img)
 
     start = time.perf_counter()
     random.shuffle(img_paths)
     cut_off = int(0.2*len(img_paths))
     img_paths = tqdm.tqdm(img_paths[:cut_off])
-    Parallel(n_jobs=-1)(delayed(extract_and_copy)(i) for i in img_paths)
-    # for i in img_paths:
-    #     extract_and_copy(i)
+    Parallel(n_jobs=-1)(delayed(extract_and_copy, size)(i) for i in img_paths)
     end = time.perf_counter()
     print(f"preocessing faces took {end-start} time(s).")
 
 
 if __name__ == "__main__":
-    create_face_data("Train")
+    create_face_data("Train", (64, 64))
