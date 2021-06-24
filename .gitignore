@@ -148,3 +148,5 @@ Meilensteinbericht 1 (zum 25.5.21).pdf
 
 logs/events*
 logs/plugins*
+logs/train/events*
+logs/validation/events*
