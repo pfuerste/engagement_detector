@@ -40,12 +40,13 @@ def train(old_model=None):
     else:
         model = get_func_model()
 
-    train_df = dai.get_dataframe("Train")
+    #TODO change back to train
+    train_df = dai.get_dataframe("Test")
     val_df = dai.get_dataframe("Validation")
-    train_datagen = dai.get_flowing_datagen(dai.get_datagen(), train_df, "Train")
-    val_datagen = dai.get_flowing_datagen(dai.get_datagen(), val_df, "Validation")
-    train_datagen = dai.reshaped_gen(train_datagen, 1)
-    val_datagen = dai.reshaped_gen(val_datagen, 1)
+    train_datagen = dai.get_flowing_datagen(dai.get_datagen(), train_df, "Test", (32, 32))
+    val_datagen = dai.get_flowing_datagen(dai.get_datagen(), val_df, "Validation", (32, 32))
+    train_datagen = dai.reshaped_gen(train_datagen)
+    val_datagen = dai.reshaped_gen(val_datagen)
     print("Got Dataframes.")
 
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -54,10 +55,21 @@ def train(old_model=None):
         monitor='val_Engagement_accuracy',
         mode='auto',
         save_best_only=True)
-    tb_callback = keras.callbacks.TensorBoard(log_dir=log_dir,
-                                              histogram_freq=0, write_graph=True, write_images=False)
+    tb_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0,
+                                              write_graph=True, write_images=False)
     callbacks = [model_checkpoint_callback,
                  tb_callback]
+
+    # Distribution over all train data computed by data/analysis.py
+    bs = [111681, 82821, 41076, 6412]
+    es = [1229, 9088, 114112, 117561]
+    fs = [157661, 61373, 19867, 3089]
+    cs = [187164, 45148, 7907, 1771]
+    class_weights = {"Boredom": {0: 1 / bs[0] * sum(bs) / 4, 1: 1 / bs[1] * sum(bs) / 4, 2: 1 / bs[2] * sum(bs) / 4, 3: 1 / bs[3] * sum(bs) / 4},
+                     "Engagement": {0: 1 / es[0] * sum(bs) / 4, 1: 1 / es[1] * sum(es) / 4, 2: 1 / es[2] * sum(es) / 4, 3: 1 / es[3] * sum(es) / 4},
+                     "Frustration": {0: 1 / fs[0] * sum(fs) / 4, 1: 1 / fs[1] * sum(fs) / 4, 2: 1 / fs[2] * sum(fs) / 4, 3: 1 / fs[3] * sum(fs) / 4},
+                     "Confusion": {0: 1 / cs[0] * sum(cs) / 4, 1: 1 / cs[1] * sum(cs) / 4, 2: 1 / cs[2] * sum(cs) / 4, 3: 1 / cs[3] * sum(cs) / 4}
+                     }
 
     print("Got Model, starting to train.")
     model.fit_generator(generator=train_datagen,
@@ -65,7 +77,9 @@ def train(old_model=None):
                         validation_data=train_datagen,
                         validation_steps=params["val_steps"],
                         epochs=params["epochs"],
-                        callbacks=callbacks)
+                        callbacks=callbacks,
+                        class_weight=class_weights,
+                        use_multiprocessing=True)
     model.save(os.path.join(model_dir, "final_model.h5"))
 
 

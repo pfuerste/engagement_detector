@@ -92,6 +92,6 @@ def create_face_data(subset, size=(32, 32)):
 
 
 if __name__ == "__main__":
-    create_face_data("Validation", (64, 64))
+    #create_face_data("Validation", (64, 64))
     create_face_data("Train", (64, 64))
-    create_face_data("Test", (64, 64))
+    #create_face_data("Test", (64, 64))

@@ -72,9 +72,9 @@ if __name__ == "__main__":
     test_df = dai.get_dataframe("Test")
     test_datagen = dai.get_flowing_datagen(dai.get_datagen(), test_df, "Test")
 
-#TODO Fix reihenfolge überall sonst
-#TODO  fix klassenimbalance
-#TODO größere bilder
-#TODO Trainiere neu
+    #TODO Fix reihenfolge überall sonst
+    #TODO  fix klassenimbalance
+    #TODO größere bilder
+    #TODO Trainiere neu
 
     test_model(model, test_datagen, 17000/32)
