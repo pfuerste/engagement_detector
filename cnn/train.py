@@ -29,6 +29,9 @@ def train(old_model=None):
 
     print(tf.config.list_physical_devices())
 
+    # tf.config.threading.set_intra_op_parallelism_threads(10)
+    # tf.config.threading.set_inter_op_parallelism_threads(10)
+
     root = yaml.safe_load(open("config.yml"))["root"]
     model_dir = os.path.join(root, "cnn", "models")
     log_dir = os.path.join(root, "logs")
