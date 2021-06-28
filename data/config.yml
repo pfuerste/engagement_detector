@@ -1,2 +1,2 @@
-root: C:\Users\phili\_Documents\SS21\AWP\engagement_detector
-data_root: C:\Users\phili\Documents\Datasets\DAiSEE
+root: /content/engagement_detector
+data_root: /content/drive/MyDrive/DAiSEE_upload

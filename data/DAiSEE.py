@@ -8,7 +8,9 @@ def get_dataframe(subset):
     data_root = yaml.safe_load(open("data/config.yml"))["data_root"]
     label_dir = os.path.join(data_root, "Labels")
     csv_path = os.path.join(label_dir, subset + "ImgLabels.csv")
-    return pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path)
+    df["ClipID"] = df["ClipID"].apply(lambda x: x.replace("\\", "/"))
+    return df
 
 
 def get_datagen():
@@ -30,7 +32,7 @@ def get_datagen():
     return datagen
 
 
-def get_flowing_datagen(datagen, df, subset):
+def get_flowing_datagen(datagen, df, subset, size=None):
     """Returns keras datagen which reads data from pandas dataframe.
 
     Args:
@@ -43,20 +45,28 @@ def get_flowing_datagen(datagen, df, subset):
     """
     root = yaml.safe_load(open("config.yml"))["root"]
     data_root = yaml.safe_load(open(os.path.join(root, "data/config.yml")))["data_root"]
-    subdir = os.path.join(data_root, "DataSet", subset)
+    subdir = os.path.join(data_root, "DataSet", "Face" + subset + str(size[0]))
     subset = "training" if subset == "Train" else "validation"
+    shuffle = True if subset == "training" else False
+    target_size = (32, 32) if not size else size
     datagen = datagen.flow_from_dataframe(
         dataframe=df,
         directory=subdir,
         x_col="ClipID",
-        y_col=list(df.columns.drop("ClipID")),
+        y_col=df.columns.drop("ClipID"),
         subset=subset.lower(),
         batch_size=32,
         seed=42,
-        shuffle=True,
+        shuffle=shuffle,
         class_mode="raw",
-        target_size=(32, 32))
+        target_size=target_size)
     return datagen
+
+
+def reshaped_gen(generator):
+    for x, y in generator:
+        y = [y[:, 0], y[:, 1], y[:, 2], y[:, 3]]
+        yield x, y
 
 
 if __name__ == "__main__":
@@ -64,10 +74,16 @@ if __name__ == "__main__":
     # write_img_csv("Train")
     # write_img_csv("Validation")
 
-    subset = "Validation"
+    subset = "Test"
     df = get_dataframe(subset)
-    print(df.head())
-    print(list(df.columns.drop("ClipID")))
-    # print(df.columns)
     datagen = get_datagen()
-    flowing = get_flowing_datagen(datagen, df, subset)
+    flowing = get_flowing_datagen(datagen, df, subset, (64, 64))
+    print(flowing.target_size)
+
+    for data, label in flowing:
+        print(label.shape)
+        break
+
+    for data, label in reshaped_gen(flowing):
+        print(label.shape)
+        break
