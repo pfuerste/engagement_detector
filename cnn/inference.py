@@ -23,10 +23,10 @@ if __name__ == "__main__":
     data_root = yaml.safe_load(open("config.yml"))["data_root"]
     model_dir = os.path.join(root, "cnn", "models")
     model = get_func_model()
-    model.load_weights(os.path.join(model_dir, "checkpoints_func.hdf5"))
-    imgs = [os.path.join(data_root, "DataSet/FaceTest32/500044/5000441001/5000441001104.jpg")]
-            # os.path.join(data_root, "DataSet/FaceTest32/500044/5000441001/5000441001121.jpg"),
-            # os.path.join(data_root, "DataSet/FaceTest32/940328/940328016/940328016233.jpg")]
+    model.load_weights(r"C:\Users\phili\_Documents\SS21\AWP\engagement_detector\cnn\models\untuned_final_func.hdf5")
+    imgs = [os.path.join(data_root, "DataSet/FaceTest32/500044/5000441001/5000441001104.jpg"),
+            os.path.join(data_root, "DataSet/FaceTest32/500044/5000441001/5000441001121.jpg"),
+            os.path.join(data_root, "DataSet/FaceTest32/940328/940328016/940328016233.jpg")]
     imgs = [plt.imread(path) for path in imgs]
     imgs = np.array(imgs)
     #print(imgs.shape)

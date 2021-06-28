@@ -8,7 +8,7 @@ import tensorflow as tf
 import keras
 
 
-def get_model(input_shape=(32, 32, 3)):
+def get_model(input_shape=(64, 64, 3)):
     """Returns a compiled model.
 
     Args:
@@ -98,10 +98,9 @@ def get_model(input_shape=(32, 32, 3)):
                   loss=losses.MeanSquaredError(),
                   metrics=[metrics.MeanSquaredError()])
     loss = losses.SparseCategoricalCrossentropy()
-    #loss = losses.MeanSquaredError()
     model.compile(optimizer=optimizer,
                   loss=loss, metrics=[metrics.sparse_categorical_crossentropy])
-    print(model.summary())
+    # print(model.summary())
     return model
 
 
@@ -275,11 +274,9 @@ def get_func_model(input_shape=(32, 32, 3)):
                         "Confusion": 'sparse_categorical_crossentropy',
                         "Frustration": 'sparse_categorical_crossentropy'},
                   metrics=['sparse_categorical_crossentropy', 'accuracy'])
-    print(model.summary())
+    # print(model.summary())
     return model
 
 
 if __name__ == "__main__":
-    # get_model()
-    get_func_model()
-    get_func_model((64, 64, 3))
+    pass
