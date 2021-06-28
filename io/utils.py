@@ -33,7 +33,7 @@ def get_angle(p1, p2):
     if p1 == p2:
         raise "Angle between p1 == p2 ill-defined"
     rad = np.arctan2(p1[1] - p2[1], p1[0] - p2[0])
-    
+
     return np.rad2deg(rad)
 
 
@@ -58,9 +58,7 @@ def hough_lines_cutter(img):
         deg = get_angle((lines[i][0][0], lines[i][0][1]),
                         (lines[i][0][2], lines[i][0][3]))
         if abs(deg) not in [0, 90, 180]:
-            # print(deg)
             continue
-        # print(deg)
         cv2.line(line_img, (lines[i][0][0], lines[i][0][1]),
                  (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 3, cv2.LINE_AA)
 
@@ -74,11 +72,4 @@ def hough_lines_cutter(img):
 
 
 if __name__ == "__main__":
-    # img = cv2.imread('input/data/zoom_ui2.png')
-    # line_img = np.zeros_like(img)
-    # hough_lines_cutter(img)
-
-    points = [(0, 0), (0, 1), (1, 0), (1, 1)]
-    for p1 in points:
-        for p2 in points:
-            print(get_angle(p1, p2))
+    pass
