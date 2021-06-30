@@ -26,12 +26,12 @@ def background_screenshot(hwnd, width, height):
     win32gui.DeleteObject(dataBitMap.GetHandle())
 
 
-def take_screenshot():
-    im = ImageGrab.grab()
-    dt = datetime.now()
-    fname = os.path.join("input", "data", "pic_{}.{}.png".format(
-        dt.strftime("%H%M_%S"), dt.microsecond // 100000))
-    im.save(fname, 'png')
+def screenshot():
+    img = ImageGrab.grab()
+    # dt = datetime.now()
+    # fname = os.path.join("input", "data", "pic_{}.{}.png".format(
+    #     dt.strftime("%H%M_%S"), dt.microsecond // 100000))
+    return [img]
 
 
 if __name__ == "__main__":
