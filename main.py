@@ -74,11 +74,6 @@ def main():
         preds = probs.argmax(axis=2)
         person_scores = preds.T
 
-        # probs = np.squeeze(probs, axis=-1)
-        # print(probs.shape)
-        # print(probs[0])
-        # print(probs[0, 0])
-        # print(probs[1, 0])
 
         # probs_person = probs.T  # np.reshape(probs, (probs.))
         # print(probs_person)
