@@ -5,7 +5,8 @@ import tensorflow.keras.optimizers as optimizers
 import tensorflow.keras.metrics as metrics
 from tensorflow.keras import Model
 import tensorflow as tf
-import keras
+import numpy as np
+import cv2
 
 
 def get_model(input_shape=(64, 64, 3)):
@@ -276,6 +277,22 @@ def get_func_model(input_shape=(64, 64, 3)):
                   metrics=['sparse_categorical_crossentropy', 'accuracy'])
     # print(model.summary())
     return model
+
+
+def batchify(list, img_shape=(64, 64, 3)):
+    """Resize input faces an put them in a batch for prediction.
+
+    Args:
+        list (list): list of images (np.array)
+        img_shape (tuple, optional): desired shape of individual images. Defaults to (64, 64, 3).
+
+    Returns:
+        np.array: resized images in array of shape (len(list), *img_shape)
+    """
+    batch = np.zeros(shape=((len(list), *img_shape)))
+    for i, img in enumerate(list):
+        batch[i] = cv2.resize(img, img_shape[:2])
+    return batch
 
 
 if __name__ == "__main__":

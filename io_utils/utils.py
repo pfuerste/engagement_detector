@@ -3,13 +3,6 @@ import cv2
 from matplotlib import pyplot as plt
 
 
-def batchify(list, img_shape=(64, 64, 3)):
-    batch = np.zeros(shape=((len(list), *img_shape)))
-    for i, img in enumerate(list):
-        batch[i] = cv2.resize(img, img_shape[:2])
-    return batch
-
-
 def crop_bbs(img, bbs):
     """Returns n cropped bbs from an image and a list of n bb-coordinates.
 
