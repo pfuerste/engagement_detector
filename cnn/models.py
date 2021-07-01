@@ -104,7 +104,7 @@ def get_model(input_shape=(64, 64, 3)):
     return model
 
 
-def get_func_model(input_shape=(32, 32, 3)):
+def get_func_model(input_shape=(64, 64, 3)):
     """Returns a compiled model with multiple output branches.
 
     Args:
