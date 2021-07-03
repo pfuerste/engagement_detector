@@ -27,6 +27,7 @@ def fill_up_inference_data(data, t, index=None):
 
 
 def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings, t):
+    # TODO Test for change of positions
     # Manage early timesteps
     # Initialize structures in first time step if faces were found
     if t == 0 and curr_encodings:
@@ -56,21 +57,17 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
 
     # "Usual" case: Found faces during lecture
     rets = dict(zip(range(len(all_encodings)+1), [0] * (len(all_encodings)+1)))
-    for encoding in curr_encodings:
+    for preds, encoding in zip(new_inferences, curr_encodings):
         # TODO check this tolerance value, maybe implement adaptive tolerance for hard cases
         ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.3)
         ret = [1 if x else 0 for x in ret]
         rets[sum(ret)] += 1
         print(rets)
-        #print(person_data)
         # Same faces found in earlier iteration: Append to corresponding data after filling gaps there
         if sum(ret) == 1:
-            print("KNOWN PERSON FOUND")
             person_index = ret.index(1)
             diff = t - len(person_data[person_index][0]) - 1
-        #  TODO This person is newly recognized: Make new entry and fill earlier gaps
         if sum(ret) == 0:
-            print("NEW PERSON FOUND")
             all_encodings.append(encoding)
             person_index = len(all_encodings) - 1
             diff = t
@@ -78,13 +75,11 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
         for i in range(4):
             # Saving like this (4 lists of len t per person) is bad memory access,
             # but better for later evaluation
-            # TODO fill missing spots in t, TEST -1
             person_data[person_index][i].extend([-1] * diff)
-            person_data[person_index][i].append(new_inferences[person_index][i])
+            person_data[person_index][i].append(preds[i])
 
-
-    # print(rets)
-    # print(len(curr_encodings) == sum(rets.values()))
+    # Fill up for person data for faces which where not found in this frame.
+    # All data will have the same length now.
     person_data = fill_up_inference_data(person_data, t)
     return person_data, all_encodings
 
@@ -149,8 +144,9 @@ def main():
                     curr_encodings.append(enc[0])
         if not faces:
             t += 1
-            print("no_faces_detected")
+            print("no facesdetected")
             continue
+        print("Face detected")
         # inference
         # Returns array of shape [num_targets=4, num_persons, num_classes=4]
         probs = model.predict(batchify(faces))
@@ -167,13 +163,12 @@ def main():
         # match encodings & metrics
         if not performance_mode:
             person_data, all_encodings = manage_encodings(person_data, person_preds, all_encodings, curr_encodings, t)
-            # print(person_data)
         # calc intra-session metrics
         # update gui
         print(person_data)
         t += 1
         end = time.perf_counter()
-        print(f"Processing one image (with {len(face_locs)} found persons) took {(end-start)} seconds.")
+        print(f"Processing one image (with {len(face_locs)} found faces) took {(end-start)} seconds.")
     # save data
 
 
