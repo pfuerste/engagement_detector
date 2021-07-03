@@ -13,6 +13,19 @@ from io_utils.screen_grab import screenshot
 from cnn.models import get_func_model, batchify
 
 
+def fill_up_inference_data(data, t, index=None):
+    for i, single_data in enumerate(data):
+        if index and i != index:
+            # Make this function usable for filling up single persons too
+            continue
+        filled = len(single_data[0])
+        diff = t - filled + 1
+        for emotion_data in single_data:
+            assert len(emotion_data) == filled
+            emotion_data.extend([-1] * diff)
+    return data
+
+
 def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings, t):
     # Manage early timesteps
     # Initialize structures in first time step if faces were found
@@ -41,36 +54,42 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
         all_encodings = curr_encodings
         return person_data, all_encodings
 
+    # "Usual" case: Found faces during lecture
     rets = dict(zip(range(len(all_encodings)+1), [0] * (len(all_encodings)+1)))
-    print(rets)
     for encoding in curr_encodings:
         # TODO check this tolerance value, maybe implement adaptive tolerance for hard cases
         ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.3)
         ret = [1 if x else 0 for x in ret]
         rets[sum(ret)] += 1
-
-        # Same faces found in earlier iteration
+        print(rets)
+        #print(person_data)
+        # Same faces found in earlier iteration: Append to corresponding data after filling gaps there
         if sum(ret) == 1:
+            print("KNOWN PERSON FOUND")
             person_index = ret.index(1)
-            for i in range(4):
-                # Saving like this (4 lists of len t per person) is bad memory access,
-                # but better for later evaluation
-                # TODO fill missing spots in t, TEST -1
-                diff = t - len(person_data[person_index][i]) - 1
-                person_data[person_index][i].extend([-1] * diff)
-                person_data[person_index][i].append(new_inferences[person_index][i])
-
-        # This person is newly recognized
+            diff = t - len(person_data[person_index][0]) - 1
+        #  TODO This person is newly recognized: Make new entry and fill earlier gaps
         if sum(ret) == 0:
+            print("NEW PERSON FOUND")
             all_encodings.append(encoding)
+            person_index = len(all_encodings) - 1
+            diff = t
+            person_data.append([[], [], [], []])
+        for i in range(4):
+            # Saving like this (4 lists of len t per person) is bad memory access,
+            # but better for later evaluation
+            # TODO fill missing spots in t, TEST -1
+            person_data[person_index][i].extend([-1] * diff)
+            person_data[person_index][i].append(new_inferences[person_index][i])
+
 
     # print(rets)
     # print(len(curr_encodings) == sum(rets.values()))
+    person_data = fill_up_inference_data(person_data, t)
     return person_data, all_encodings
 
 
 def main():
-    pass
     # read config (developer info)
     root = yaml.safe_load(open("config.yml"))["root"]
     model_path = yaml.safe_load(open("config.yml"))["model"]
@@ -105,7 +124,7 @@ def main():
     # while not stop:
     # get image
     # TODO all functions have to work with zero faces too
-    for j in range(3):
+    for j in range(20):
         start = time.perf_counter()
         imgs = input_via()
         print("screenshot done")
