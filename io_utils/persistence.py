@@ -23,6 +23,7 @@ def sparsify(arr, ax=2, keep=0.25):
 
 def get_current_session_path(sessions_root, name):
     """Returns session_root/name/x with x being an identifier of the current time.
+       Creates that dir if not present.
        Call at the beginning of a session.
 
     Args:
@@ -33,7 +34,10 @@ def get_current_session_path(sessions_root, name):
         str: path of new dir
     """
     now = datetime.now()
-    return os.path.join(sessions_root, name, now.strftime('%Y%m%d%H'))
+    path = os.path.join(sessions_root, name, now.strftime('%Y%m%d%H'))
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    return path
 
 
 def get_latest_session_path(sessions_root, name):
@@ -75,8 +79,9 @@ def get_sorted_session_paths(sessions_root, name):
 
 
 def save_session(sessions_root, name, ids, scores, keep=1.0):
+    # TODO Handle (merge?) multiple started session in the same hour in case of crash.
     """Save ids & scores to disk.
-
+       
     Args:
         sessions_root (str): path for data of all data
         name (str): lecture name, will be subdir in sessions_root
@@ -87,6 +92,7 @@ def save_session(sessions_root, name, ids, scores, keep=1.0):
     if scores.ndim == 3 and keep != 1.0:
         scores = sparsify(scores, keep=keep)
     dir = get_latest_session_path(sessions_root, name)
+    print(ids.shape, scores.shape)
     np.save(os.path.join(dir, "ids.npy"), ids)
     np.save(os.path.join(dir, "scores.npy"), scores)
 
