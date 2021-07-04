@@ -2,3 +2,4 @@ root: C:\Users\phili\_Documents\SS21\AWP\engagement_detector
 data_root: C:\Users\phili\Documents\Datasets\DAiSEE
 model: C:\Users\phili\_Documents\SS21\AWP\engagement_detector\cnn\models\untuned_final_func.hdf5
 logs: C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs
+inference_interval: 5

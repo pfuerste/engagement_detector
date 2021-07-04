@@ -151,3 +151,4 @@ logs/plugins*
 logs/train/events*
 logs/validation/events*
 colab_logs/*
+logs/*
