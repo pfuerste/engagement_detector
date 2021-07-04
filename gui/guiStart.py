@@ -2,12 +2,11 @@ from tkinter import *
 from tkinter import ttk
 import tkinter as tk
 import time
-#from io_utils import persistence
 
 
 class guiStart:
 
-    def __init__(self):
+    def __init__(self, lecture_names):
         self.root = Tk()
         self.root.title("Engagement Detector")
         self.root.geometry("340x340")
@@ -21,7 +20,7 @@ class guiStart:
         self.LectureNameLabel.place(x=20, y=20)
         #self.LectureNameEntry = Entry(self.root)
         #self.LectureNameEntry.place(x=160, y=20)
-        self.list = ["a", "b", "c"]
+        self.list = old_names
         self.LectureNameDropDown = ttk.Combobox(self.root, values=self.list)
         self.LectureNameDropDown.place(x=160, y=20)
         self.DurationLabel = Label(self.root, text="Duration in minutes: ")
@@ -113,4 +112,4 @@ class guiStart:
 
 
 if __name__ == "__main__":
-    start = guiStart()
+    start = guiStart(["Test1", "Test2"])
