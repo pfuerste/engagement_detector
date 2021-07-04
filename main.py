@@ -11,6 +11,8 @@ from io_utils import face_extract as fe
 from io_utils.utils import crop_bbs
 from io_utils.screen_grab import screenshot
 from cnn.models import get_func_model, batchify
+import gui.plots
+# import gui.guiStart
 
 
 def fill_up_inference_data(data, t, index=None):
@@ -58,11 +60,11 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
     # "Usual" case: Found faces during lecture
     rets = dict(zip(range(len(all_encodings)+1), [0] * (len(all_encodings)+1)))
     for preds, encoding in zip(new_inferences, curr_encodings):
-        # TODO check this tolerance value, maybe implement adaptive tolerance for hard cases
+        # TODO check this tolerance value, maybe implement adaptive tolerance for hard cases?
         ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.3)
         ret = [1 if x else 0 for x in ret]
         rets[sum(ret)] += 1
-        print(rets)
+        # print(rets)
         # Same faces found in earlier iteration: Append to corresponding data after filling gaps there
         if sum(ret) == 1:
             person_index = ret.index(1)
@@ -97,10 +99,11 @@ def main():
     # TODO
     # open gui
     # read from gui:
+    # g = gui.guiStart()
 
     # lecture name (new or dropdown of old ones)
-    lecture = "Test"
-
+    lecture_name = "Test"
+    save_in = persistence.get_current_session_path(log_dir, lecture_name)
     # input method (default: screenshot)
     input_via = screenshot
 
@@ -108,18 +111,17 @@ def main():
     performance_mode = False
 
     # TODO while not stop & inference intervals (hardcoden)
-
     stop = False
     all_encodings = list()
     # 2 Lists for Results, because time is more important than memory
-    vis_data = [[], [], [], []]
+    vis_data = gui.plots.vis_data()
     person_data = list()
     t = 0
     # loop while (not stop button pressed)
     # while not stop:
     # get image
     # TODO all functions have to work with zero faces too
-    for j in range(20):
+    for j in range(3):
         start = time.perf_counter()
         imgs = input_via()
         print("screenshot done")
@@ -157,19 +159,20 @@ def main():
         person_preds = preds.T
 
         # Update visualization data
-        for i, emotion in enumerate(preds):
-            vis_data[i].append(emotion)
+        vis_data.append_data(preds)
 
         # match encodings & metrics
         if not performance_mode:
             person_data, all_encodings = manage_encodings(person_data, person_preds, all_encodings, curr_encodings, t)
-        # calc intra-session metrics
-        # update gui
-        print(person_data)
+        # TODO calc intra-session metrics
+        # TODO update gui
+        # print(person_data)
         t += 1
         end = time.perf_counter()
         print(f"Processing one image (with {len(face_locs)} found faces) took {(end-start)} seconds.")
-    # save data
+    # TODO save data (only at end or in fixed intervalls?)
+    persistence.save_session(log_dir, lecture_name,
+                             np.array(all_encodings), np.array(person_data))
 
 
 if __name__ == "__main__":
