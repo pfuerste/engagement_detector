@@ -13,6 +13,8 @@ class guiStart:
         self.LectureName = ""
         self.RoomName = ""
         self.BrowserName = ""
+        self.InputMethod = ""
+        self.PerformanceMode = False
         self.LectureNameLabel = Label(self.root, text="Lecture Name: ")
         self.LectureNameLabel.place(x=20, y=20)
         self.LectureNameEntry = Entry(self.root)
@@ -62,26 +64,15 @@ class guiStart:
         self.root.mainloop()
 
     def start(self):
+        self.LectureName = self.LectureNameEntry.get()
+        if self.checkboxPerformance.get() == 1:
+            self.PerformanceMode = True
         if self.checkboxWindowgrab.get() == 1:
-            if self.checkboxPerformance.get() == 1:
-                self.LectureName = self.LectureNameEntry.get()
-                self.RoomName = self.RoomNameEntry.get()
-                self.BrowserName = self.BrowserDropDown.get()
-                # print("WindowGrab Performance Modus starten")
-            else:
-                self.LectureName = self.LectureNameEntry.get()
-                self.RoomName = self.RoomNameEntry.get()
-                self.BrowserName = self.BrowserDropDown.get()
-                # print("WindowGrab Modus starten")
-
+            self.InputMethod = "WindowGrab"
+            self.RoomName = self.RoomNameEntry.get()
+            self.BrowserName = self.BrowserDropDown.get()
         elif self.checkboxScreenshot.get() == 1:
-            if self.checkboxPerformance.get() == 1:
-                self.LectureName = self.LectureNameEntry.get()
-                # print("Screenshot Performance Modus starten")
-
-            else:
-                self.LectureName = self.LectureNameEntry.get()
-                # print("Screenshot Modus starten")
+            self.InputMethod = "ScreenShot"
         # Aufruf der jeweiligen neuen Klasse fehlt
         # Loeschen des alten Fensters
         self.root.destroy()
