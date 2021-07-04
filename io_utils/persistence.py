@@ -45,7 +45,7 @@ def get_latest_session_path(sessions_root, name):
     """Return path to dir of latest session with name.
 
     Args:
-        sessions_root (str): path for data of all data
+        sessions_root (str): path for data of all lectures
         name (str): lecture name, will be subdir in sessions_root
 
     Returns:
@@ -58,7 +58,7 @@ def get_sorted_session_paths(sessions_root, name):
     """Return time-sorted paths to dirs of session with name.
 
     Args:
-        sessions_root (str): path for data of all data
+        sessions_root (str): path for data of all lectures
         name (str): lecture name, will be subdir in sessions_root
 
     Returns:
@@ -84,7 +84,7 @@ def save_session(save_in, ids, scores, keep=1.0):
        Num for handling interruptions / crashes during one lecture.
 
     Args:
-        # sessions_root (str): path for data of all data
+        # sessions_root (str): path for data of all lectures
         # name (str): lecture name, will be subdir in sessions_root
         save_in (str): path of current lecture dir
         ids (np.array): array of face encodings
@@ -113,7 +113,7 @@ def load_all_sessions(sessions_root, name):
        Memory consumption in Byte for one session: N*(128*sizeof(float)+T*4*sizeof(float))
 
     Args:
-        sessions_root (str): path for data of all data
+        sessions_root (str): path for data of all lectures
         name (str): lecture name, will be subdir in sessions_root
 
     Returns:
@@ -129,7 +129,7 @@ def load_last_session(sessions_root, name, as_lists=False):
     """Loads most recent sessions of the lecture into memory.
 
     Args:
-        sessions_root (str): path for data of all data
+        sessions_root (str): path for data of all lectures
         name (str): lecture name, will be subdir in sessions_root
         as_lists (bool): return lists or arrays
     Returns:
@@ -144,10 +144,22 @@ def load_last_session(sessions_root, name, as_lists=False):
     return ids, scores
 
 
+def get_old_lecture_names(sessions_root):
+    """Get list of all names of lectures in log_dir.
+
+    Args:
+        sessions_root (str): path for data of all lectures
+
+    Returns:
+        list: all lecture names
+    """
+    return os.listdir(sessions_root)
+
 if __name__ == "__main__":
     sessions_root = yaml.safe_load(open("config.yml"))["logs"]
+    print(get_old_lecture_names(sessions_root))
     # os.makedirs(get_current_session_path(sessions_root, "test"))
-    load_last_session(sessions_root, "Test", True)
+    #load_last_session(sessions_root, "Test", True)
     #print(get_sorted_session_paths(sessions_root, "test"))
     # a = np.array([np.arange(0, 20), np.arange(0, 20)])
     # print(sparsify(a, 0, 0.5))
