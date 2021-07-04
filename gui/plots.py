@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
+                                               NavigationToolbar2Tk)
 
 class vis_data():
     """Saves data for visualization to not do calculations more often
@@ -49,23 +50,34 @@ class vis_data():
         return self.avg_boredom[-1], self.avg_engagement[-1], \
             self.avg_confusion[-1], self.avg_frustration[-1]
 
-    def set_avg_plots(self):
-        fig, (ax0, ax1) = plt.subplots(2, 1)
-        ax0.set_ylim(-1, 4)
-        #ax0.grid()
-        ax0.bar(x=["Boredom", "Engagement", "Confusion", "Frustration"],
-                height=self.current_avgs(), color=["black", "green", "purple", "red"])
+    def get_avg_plots(self, window):
+        # break if used without data
+        if not self.avg_boredom:
+            fig, (ax0, ax1) = plt.subplots(2, 1)
+        else:
+            fig, (ax0, ax1) = plt.subplots(2, 1)
+            ax0.set_ylim(-1, 4)
+            ax0.bar(x=["Boredom", "Engagement", "Confusion", "Frustration"],
+                    height=self.current_avgs(), 
+                    color=["black", "green", "purple", "red"])
 
-        ax1.set_ylim(-1, 4)
-        ax1.grid()
-        ax1.plot(self.avg_boredom, c="black")
-        ax1.plot(self.avg_engagement, c="green")
-        ax1.plot(self.avg_confusion, c="purple")
-        ax1.plot(self.avg_frustration, c="red")
-        self.fig_avg = fig
-        self.ax0_avg = ax0
-        self.ax1_avg = ax1
-        plt.close()
+            ax1.set_ylim(-1, 4)
+            ax1.grid()
+            ax1.plot(self.avg_boredom, c="black")
+            ax1.plot(self.avg_engagement, c="green")
+            ax1.plot(self.avg_confusion, c="purple")
+            ax1.plot(self.avg_frustration, c="red")
+
+        canvas = FigureCanvasTkAgg(fig, master=window)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+        toolbar = NavigationToolbar2Tk(canvas, window)
+        toolbar.update()
+        canvas.get_tk_widget().pack()
+        #self.fig_avg = fig
+        #self.ax0_avg = ax0
+        #self.ax1_avg = ax1
+        #plt.close()
         #print(type(fig))
         #plt.show()
 
