@@ -13,6 +13,9 @@ class guiStart:
         self.LectureName = ""
         self.RoomName = ""
         self.BrowserName = ""
+        self.Screenshot = False
+        self.WindowGrab = False
+        self.Performance = False
         self.LectureNameLabel = Label(self.root, text="Lecture Name: ")
         self.LectureNameLabel.place(x=20, y=20)
         self.LectureNameEntry = Entry(self.root)
@@ -63,25 +66,18 @@ class guiStart:
 
     def start(self):
         if self.checkboxWindowgrab.get() == 1:
+            self.LectureName = self.LectureNameEntry.get()
+            self.RoomName = self.RoomNameEntry.get()
+            self.BrowserName = self.BrowserDropDown.get()
+            self.WindowGrab = True
             if self.checkboxPerformance.get() == 1:
-                self.LectureName = self.LectureNameEntry.get()
-                self.RoomName = self.RoomNameEntry.get()
-                self.BrowserName = self.BrowserDropDown.get()
-                # print("WindowGrab Performance Modus starten")
-            else:
-                self.LectureName = self.LectureNameEntry.get()
-                self.RoomName = self.RoomNameEntry.get()
-                self.BrowserName = self.BrowserDropDown.get()
-                # print("WindowGrab Modus starten")
+                self.Performance = True
 
-        elif self.checkboxScreenshot.get() == 1:
+        else:
+            self.LectureName = self.LectureNameEntry.get()
+            self.Screenshot = True
             if self.checkboxPerformance.get() == 1:
-                self.LectureName = self.LectureNameEntry.get()
-                # print("Screenshot Performance Modus starten")
-
-            else:
-                self.LectureName = self.LectureNameEntry.get()
-                # print("Screenshot Modus starten")
+                self.Performance = True
         # Aufruf der jeweiligen neuen Klasse fehlt
         # Loeschen des alten Fensters
         self.root.destroy()
@@ -109,5 +105,5 @@ class guiStart:
             self.StartButton.config(state='disabled')
 
 
-if name == "main":
+if __name__ == "main":
     start = guiStart()
