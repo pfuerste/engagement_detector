@@ -14,6 +14,7 @@ class guiStart:
         self.RoomName = ""
         self.BrowserName = ""
         self.InputMethod = ""
+        self.Duration = 90
         self.PerformanceMode = False
         self.LectureNameLabel = Label(self.root, text="Lecture Name: ")
         self.LectureNameLabel.place(x=20, y=20)

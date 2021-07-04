@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 
+
 class vis_data():
     """Saves data for visualization to not do calculations more often
     than needed for live plotting.
@@ -30,9 +31,6 @@ class vis_data():
                                       len([x for x in data[2][t] if x != -1]))
             self.avg_frustration.append(sum([x for x in data[3][t] if x != -1]) /
                                         len([x for x in data[3][t] if x != -1]))
-        print(self.data)
-        print(self.avg_boredom)
-        print(self.avg_frustration)
 
     def append_data(self, new_data):
         for i, emo_data in enumerate(new_data):
@@ -58,7 +56,7 @@ class vis_data():
             fig, (ax0, ax1) = plt.subplots(2, 1)
             ax0.set_ylim(-1, 4)
             ax0.bar(x=["Boredom", "Engagement", "Confusion", "Frustration"],
-                    height=self.current_avgs(), 
+                    height=self.current_avgs(),
                     color=["black", "green", "purple", "red"])
 
             ax1.set_ylim(-1, 4)
