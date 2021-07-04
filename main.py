@@ -21,7 +21,7 @@ def fill_up_inference_data(data, t, index=None):
             # Make this function usable for filling up single persons too
             continue
         filled = len(single_data[0])
-        diff = t - filled + 1
+        diff = t - filled
         for emotion_data in single_data:
             assert len(emotion_data) == filled
             emotion_data.extend([-1] * diff)
@@ -32,7 +32,7 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
     # TODO Test for change of positions
     # Manage early timesteps
     # Initialize structures in first time step if faces were found
-    if t == 0 and curr_encodings:
+    if t == 0 and curr_encodings and not all_encodings:
         print("initializin encoding structures at t==0")
         for i in range(len(new_inferences)):
             person_data.append([[new_inferences[i][0]],
@@ -91,40 +91,49 @@ def main():
     root = yaml.safe_load(open("config.yml"))["root"]
     model_path = yaml.safe_load(open("config.yml"))["model"]
     log_dir = yaml.safe_load(open("config.yml"))["logs"]
+    interval = int(yaml.safe_load(open("config.yml"))["inference_interval"])
 
     # load model
     model = get_func_model()
     model.load_weights(model_path)
 
-    # TODO
+    # TODO connect to starter gui and read params
     # open gui
     # read from gui:
     # g = gui.guiStart()
-
-    # lecture name (new or dropdown of old ones)
+    # ! reload a paused / crashed session (automate if latest is not long ago?)
+    extend_session = True
+    # TODO lecture name (new or dropdown of old ones)
     lecture_name = "Test"
-    save_in = persistence.get_current_session_path(log_dir, lecture_name)
-    # input method (default: screenshot)
+    # TODO input method (default: screenshot)
     input_via = screenshot
-
-    # Performance_mode or not
+    # TODO Performance_mode or not
     performance_mode = False
 
-    # TODO while not stop & inference intervals (hardcoden)
-    stop = False
-    all_encodings = list()
     # 2 Lists for Results, because time is more important than memory
-    vis_data = gui.plots.vis_data()
-    person_data = list()
+    if extend_session:
+        # ? Test for edge cases
+        save_in = persistence.get_latest_session_path(log_dir, lecture_name)
+        all_encodings, person_data = persistence.load_last_session(log_dir, lecture_name, as_lists=True)
+        # print(f"loaded array: \n{person_data}")
+        vis_data = gui.plots.vis_data()
+        vis_data.reload_old_data(person_data)
+    else:
+        save_in = persistence.get_current_session_path(log_dir, lecture_name)
+        person_data = list()
+        all_encodings = list()
+        vis_data = gui.plots.vis_data()
+
+    # TODO get from intra-session ui
+    stop = False
     t = 0
     # loop while (not stop button pressed)
-    # while not stop:
-    # get image
+    # TODO while not stop:
     # TODO all functions have to work with zero faces too
-    for j in range(3):
-        start = time.perf_counter()
+    for j in range(1):
+        iter_start = time.perf_counter()
         imgs = input_via()
-        print("screenshot done")
+        print("image taken")
         # find faces
         face_locs = list()
         faces = list()
@@ -164,15 +173,20 @@ def main():
         # match encodings & metrics
         if not performance_mode:
             person_data, all_encodings = manage_encodings(person_data, person_preds, all_encodings, curr_encodings, t)
-        # TODO calc intra-session metrics
         # TODO update gui
-        # print(person_data)
+
         t += 1
-        end = time.perf_counter()
-        print(f"Processing one image (with {len(face_locs)} found faces) took {(end-start)} seconds.")
-    # TODO save data (only at end or in fixed intervalls?)
-    persistence.save_session(log_dir, lecture_name,
-                             np.array(all_encodings), np.array(person_data))
+        iter_end = time.perf_counter()
+        print(f"Processing one image (with {len(face_locs)} found faces) took {(iter_end-iter_start)} seconds.")
+        if iter_end-iter_start < interval:
+            print("sleep")
+            time.sleep(interval - (iter_end - iter_start))
+            print("wakey")
+        else:
+            print("Processing this iteration took longer than inference interval.")
+    # ? save data (only at end or in fixed intervalls?)
+    person_data = fill_up_inference_data(person_data, t)
+    persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
 
 
 if __name__ == "__main__":
