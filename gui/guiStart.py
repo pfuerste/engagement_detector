@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter as tk
+import time
 
 
 class guiStart:
@@ -9,6 +10,9 @@ class guiStart:
         self.root = Tk()
         self.root.title("Engagement Detector")
         self.root.geometry("400x300")
+        self.LectureName=""
+        self.RoomName=""
+        self.BrowserName=""
         self.LectureNameLabel = Label(self.root, text="Lecture Name: ")
         self.LectureNameLabel.place(x=20, y=20)
         self.LectureNameEntry = Entry(self.root)
@@ -60,23 +64,23 @@ class guiStart:
     def start(self):
         if self.checkboxWindowgrab.get() == 1:
             if self.checkboxPerformance.get() == 1:
-                LectureName = self.LectureNameEntry.get()
-                RoomName = self.RoomNameEntry.get()
-                BrowserName = self.BrowserDropDown.get()
+                self.LectureName = self.LectureNameEntry.get()
+                self.RoomName = self.RoomNameEntry.get()
+                self.BrowserName = self.BrowserDropDown.get()
                 # print("WindowGrab Performance Modus starten")
             else:
-                LectureName = self.LectureNameEntry.get()
-                RoomName = self.RoomNameEntry.get()
-                BrowserName = self.BrowserDropDown.get()
+                self.LectureName = self.LectureNameEntry.get()
+                self.RoomName = self.RoomNameEntry.get()
+                self.BrowserName = self.BrowserDropDown.get()
                 # print("WindowGrab Modus starten")
 
         elif self.checkboxScreenshot.get() == 1:
             if self.checkboxPerformance.get() == 1:
-                LectureName = self.LectureNameEntry.get()
+                self.LectureName = self.LectureNameEntry.get()
                 # print("Screenshot Performance Modus starten")
 
             else:
-                LectureName = self.LectureNameEntry.get()
+                self.LectureName = self.LectureNameEntry.get()
                 # print("Screenshot Modus starten")
         # Aufruf der jeweiligen neuen Klasse fehlt
         # Loeschen des alten Fensters
@@ -105,4 +109,5 @@ class guiStart:
             self.StartButton.config(state='disabled')
 
 
-start = guiStart()
+if name=="main":
+    start = guiStart()
