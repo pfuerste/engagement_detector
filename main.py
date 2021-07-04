@@ -102,7 +102,7 @@ def main():
     # read from gui:
     # g = gui.guiStart()
     # ! reload a paused / crashed session (automate if latest is not long ago?)
-    extend_session = True
+    extend_session = False
     # TODO lecture name (new or dropdown of old ones)
     lecture_name = "Test"
     # TODO input method (default: screenshot)
@@ -184,9 +184,11 @@ def main():
             print("wakey")
         else:
             print("Processing this iteration took longer than inference interval.")
+    vis_data.set_avg_plots()
     # ? save data (only at end or in fixed intervalls?)
     person_data = fill_up_inference_data(person_data, t)
     persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+    vis_data.test_fig()
 
 
 if __name__ == "__main__":

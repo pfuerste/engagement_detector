@@ -1,4 +1,4 @@
-import matplotlib.pyplot
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -49,6 +49,36 @@ class vis_data():
         return self.avg_boredom[-1], self.avg_engagement[-1], \
             self.avg_confusion[-1], self.avg_frustration[-1]
 
+    def set_avg_plots(self):
+        fig, (ax0, ax1) = plt.subplots(2, 1)
+        ax0.set_ylim(-1, 4)
+        #ax0.grid()
+        ax0.bar(x=["Boredom", "Engagement", "Confusion", "Frustration"],
+                height=self.current_avgs(), color=["black", "green", "purple", "red"])
+
+        ax1.set_ylim(-1, 4)
+        ax1.grid()
+        ax1.plot(self.avg_boredom, c="black")
+        ax1.plot(self.avg_engagement, c="green")
+        ax1.plot(self.avg_confusion, c="purple")
+        ax1.plot(self.avg_frustration, c="red")
+        self.fig_avg = fig
+        self.ax0_avg = ax0
+        self.ax1_avg = ax1
+        plt.close()
+        #print(type(fig))
+        #plt.show()
+
+    def get_avg_plots(self):
+        fig, ax0, ax1 = self.fig_avg, self.ax0_avg, self.ax1_avg
+        return fig, ax0, ax1
+
+    def test_fig(self):
+        fig, ax0, ax1 = self.get_avg_plots()
+        #fig.canvas.draw()
+        #plt.show()
+        #fig.show()
+        fig.show(fig)
 
 # TODO plots
 # intra-session
