@@ -109,5 +109,5 @@ class guiStart:
             self.StartButton.config(state='disabled')
 
 
-if name == "main":
+if __name__ == "__main__":
     start = guiStart()
