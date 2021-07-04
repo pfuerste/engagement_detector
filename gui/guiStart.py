@@ -10,9 +10,9 @@ class guiStart:
         self.root = Tk()
         self.root.title("Engagement Detector")
         self.root.geometry("400x300")
-        self.LectureName=""
-        self.RoomName=""
-        self.BrowserName=""
+        self.LectureName = ""
+        self.RoomName = ""
+        self.BrowserName = ""
         self.LectureNameLabel = Label(self.root, text="Lecture Name: ")
         self.LectureNameLabel.place(x=20, y=20)
         self.LectureNameEntry = Entry(self.root)
@@ -109,5 +109,5 @@ class guiStart:
             self.StartButton.config(state='disabled')
 
 
-if name=="main":
+if name == "main":
     start = guiStart()
