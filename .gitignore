@@ -139,3 +139,6 @@ dmypy.json
 bericht1.html
 bericht1.md
 Meilensteinbericht 1 (zum 25.5.21).pdf
+cnn/models/untuned_final_func.hdf5
+colab_logs/*
+logs/*
