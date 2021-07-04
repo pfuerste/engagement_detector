@@ -35,7 +35,7 @@ def get_current_session_path(sessions_root, name):
         str: path of new dir
     """
     now = datetime.now()
-    path = os.path.join(sessions_root, name, now.strftime('%Y%m%d%H'))
+    path = os.path.join(sessions_root, name, now.strftime('%Y%m%d%H%M'))
     if not os.path.isdir(path):
         os.makedirs(path)
     return path
@@ -51,6 +51,8 @@ def get_latest_session_path(sessions_root, name):
     Returns:
         str: path of latest dir
     """
+    if not os.path.isdir(os.path.join(sessions_root, name)):
+        return []
     return get_sorted_session_paths(sessions_root, name)[-1]
 
 
@@ -64,6 +66,8 @@ def get_sorted_session_paths(sessions_root, name):
     Returns:
         list: sorted list of paths of dirs
     """
+    if not os.path.isdir(os.path.join(sessions_root, name)):
+        return []
     paths = os.listdir(os.path.join(sessions_root, name))
     paths = [os.path.join(sessions_root, name, x) for x in paths]
     dirs = [x for x in paths if os.path.isdir(x)]
@@ -71,11 +75,11 @@ def get_sorted_session_paths(sessions_root, name):
     for dir in dirs:
         try:
             date = dir.split(os.sep)[-1]
-            date = datetime.strptime(date, '%Y%m%d%H')
+            date = datetime.strptime(date, '%Y%m%d%H%M')
             dates.append(date)
         except ValueError:
             pass
-    dates = [os.path.join(sessions_root, name, date.strftime('%Y%m%d%H')) for date in sorted(dates)]
+    dates = [os.path.join(sessions_root, name, date.strftime('%Y%m%d%H%M')) for date in sorted(dates)]
     return dates
 
 
@@ -97,7 +101,7 @@ def save_session(save_in, ids, scores, keep=1.0):
     # dir = get_latest_session_path(sessions_root, name)
     # print([x for x in os.listdir(dir) if ("ids" or "scores") in x])
     # num = len([x for x in os.listdir(dir) if ("ids" or "scores") in x])/2
-    
+
     # delete half-sessions:
     if os.path.isfile(os.path.join(dir, "ids.npy")):
         os.remove(os.path.join(dir, "ids.npy"))
@@ -108,7 +112,7 @@ def save_session(save_in, ids, scores, keep=1.0):
 
 
 def load_all_sessions(sessions_root, name):
-    # TODO as_lists?
+    # TODO as_lists? Is this function needed later?
     """Loads ALL previous sessions of the lecture into memory.
        Memory consumption in Byte for one session: N*(128*sizeof(float)+T*4*sizeof(float))
 
@@ -144,6 +148,16 @@ def load_last_session(sessions_root, name, as_lists=False):
     return ids, scores
 
 
+def last_session_difference(sessions_root, name):
+    if not get_latest_session_path(sessions_root, name):
+        return np.inf
+    now = datetime.now()
+    old_date = get_latest_session_path(sessions_root, name).split(os.sep)[-1]
+    old_date = datetime.strptime(old_date, '%Y%m%d%H%M')
+    time_diff = (now - old_date).total_seconds()/60
+    return time_diff
+
+
 def get_old_lecture_names(sessions_root):
     """Get list of all names of lectures in log_dir.
 
@@ -154,6 +168,7 @@ def get_old_lecture_names(sessions_root):
         list: all lecture names
     """
     return os.listdir(sessions_root)
+
 
 if __name__ == "__main__":
     sessions_root = yaml.safe_load(open("config.yml"))["logs"]
