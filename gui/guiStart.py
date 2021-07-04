@@ -21,14 +21,14 @@ class guiStart:
         self.LectureNameLabel.place(x=20, y=20)
         #self.LectureNameEntry = Entry(self.root)
         #self.LectureNameEntry.place(x=160, y=20)
-        self.list=["a","b","c"]
-        self.LectureNameComboBox = ttk.Combobox(self.root, values=self.list)
-        self.LectureNameComboBox.place(x=160,y=20)
+        self.list = ["a", "b", "c"]
+        self.LectureNameDropDown = ttk.Combobox(self.root, values=self.list)
+        self.LectureNameDropDown.place(x=160, y=20)
         self.DurationLabel = Label(self.root, text="Duration in minutes: ")
         self.DurationLabel.place(x=20, y=60)
         self.DurationEntry = Entry(self.root)
         self.DurationEntry.place(x=160, y=60)
-        self.DurationEntry.insert(0,"90")
+        self.DurationEntry.insert(0, "90")
         self.InputMethodLabel = Label(self.root, text="Input Method")
         self.InputMethodLabel.place(x=20, y=100)
         self.checkboxWindowgrab = tk.IntVar()
@@ -74,9 +74,9 @@ class guiStart:
         self.root.mainloop()
 
     def start(self):
-        self.LectureName = self.LectureNameEntry.get()
-        if (self.DurationEntry.get().isdigit()): 
-            self.Duration=self.DurationEntry.get()
+        self.LectureName = self.LectureNameDropDown.get()
+        if (self.DurationEntry.get().isdigit()):
+            self.Duration = self.DurationEntry.get()
         if self.checkboxPerformance.get() == 1:
             self.PerformanceMode = True
         if self.checkboxWindowgrab.get() == 1:
