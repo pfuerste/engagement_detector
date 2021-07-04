@@ -20,7 +20,7 @@ class guiStart:
         self.LectureNameLabel.place(x=20, y=20)
         #self.LectureNameEntry = Entry(self.root)
         #self.LectureNameEntry.place(x=160, y=20)
-        self.list = old_names
+        self.list = lecture_names
         self.LectureNameDropDown = ttk.Combobox(self.root, values=self.list)
         self.LectureNameDropDown.place(x=160, y=20)
         self.DurationLabel = Label(self.root, text="Duration in minutes: ")
