@@ -35,7 +35,7 @@ class Application(Frame):
 
 
     def create_plot(self, dataset):
-
+        print(self.__dict__)
         # remove old widgets
         if self.widget:
             self.widget.destroy()
@@ -76,7 +76,7 @@ def main():
 
 
     app = Application(master=root)
-    
+    print(app.__dict__)
     app.mainloop()
 
 main()

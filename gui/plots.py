@@ -50,6 +50,7 @@ class vis_data():
 
     def get_avg_plots(self, window):
         if window.widget:
+            print("destroyed")
             window.widget.destroy()
         
         # break if used without data
@@ -71,8 +72,8 @@ class vis_data():
         #plt.show()
         canvas = FigureCanvasTkAgg(fig, master=window.root)
         #canvas.draw()
-        canvas.get_tk_widget().pack(fill=BOTH)
-
+        window.widget = canvas.get_tk_widget().pack(fill=BOTH)
+        print(window.widget)
         #toolbar = NavigationToolbar2Tk(canvas, window)
         #toolbar.update()
         #canvas.get_tk_widget().pack()
