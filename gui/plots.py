@@ -52,6 +52,10 @@ class vis_data():
 
     def get_avg_plots(self, window):
         # break if used without data
+        if window.widget:
+            window.widget.destroy()
+
+
         if not self.avg_boredom:
             fig, (ax0, ax1) = plt.subplots(2, 1)
         else:
@@ -69,11 +73,11 @@ class vis_data():
             ax1.plot(self.avg_frustration, c="red")
 
         canvas = FigureCanvasTkAgg(fig, master=window)
-        canvas.draw()
+        #canvas.draw()
         canvas.get_tk_widget().pack()
-        toolbar = NavigationToolbar2Tk(canvas, window)
-        toolbar.update()
-        canvas.get_tk_widget().pack()
+        #toolbar = NavigationToolbar2Tk(canvas, window)
+        #toolbar.update()
+        #canvas.get_tk_widget().pack()
         #self.fig_avg = fig
         #self.ax0_avg = ax0
         #self.ax1_avg = ax1
@@ -91,6 +95,7 @@ class vis_data():
         #plt.show()
         #fig.show()
         fig.show(fig)
+
 
 # TODO plots
 # intra-session
