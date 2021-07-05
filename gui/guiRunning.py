@@ -1,14 +1,16 @@
 from tkinter import *
+# from .plots import get_avg_plots
+
 
 class Application(Frame):
 
     def __init__(self, master=None):
-        self.root=Tk()
+        self.root = Tk()
         self.root.title("Engagement Detector")
         self.root.geometry("400x240+0+0")
         Frame.__init__(self, master)
-        matplotlib.rcParams["figure.figsize"] = [6,2]
-        self.data_set = [1,2,3,4,5,6]
+        #matplotlib.rcParams["figure.figsize"] = [6, 2]
+        #self.data_set = [1, 2, 3, 4, 5, 6]
         self.initUI()
 
         # to assign widgets
@@ -25,5 +27,5 @@ class Application(Frame):
         quitbutton.place(relx=0.6, rely=0.9)
 
     def alpha(self):
-#           self.create_plot()
-#            self.after(1000,self.alpha)
+        
+        self.after(1000, self.alpha)

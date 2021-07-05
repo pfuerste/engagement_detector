@@ -12,7 +12,7 @@ from io_utils.utils import crop_bbs
 from io_utils.screen_grab import screenshot
 from cnn.models import get_func_model, batchify
 import gui.plots
-# import gui.guiStart
+import gui.guiRunning
 
 
 def fill_up_inference_data(data, t, index=None):
@@ -124,6 +124,8 @@ def main():
         all_encodings = list()
         vis_data = gui.plots.vis_data()
 
+    gui_running = gui.guiRunning.Application()
+
     # TODO get from intra-session ui
     stop = False
     t = 0
@@ -173,7 +175,9 @@ def main():
         # match encodings & metrics
         if not performance_mode:
             person_data, all_encodings = manage_encodings(person_data, person_preds, all_encodings, curr_encodings, t)
+
         # TODO update gui
+
 
         t += 1
         iter_end = time.perf_counter()
@@ -184,7 +188,7 @@ def main():
             print("wakey")
         else:
             print("Processing this iteration took longer than inference interval.")
-    vis_data.set_avg_plots()
+
     # ? save data (only at end or in fixed intervalls?)
     person_data = fill_up_inference_data(person_data, t)
     persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
