@@ -152,3 +152,5 @@ logs/train/events*
 logs/validation/events*
 colab_logs/*
 logs/*
+reports/bericht4.md
+
