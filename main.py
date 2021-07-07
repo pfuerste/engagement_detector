@@ -115,7 +115,7 @@ def main():
     # If the last session was less than session_duration ago, use that sessions data (probably crash/pause)
     time_diff = persistence.last_session_difference(log_dir, lecture_name)
     extend_session = False if time_diff > session_duration else True
-    #print(time_diff)
+    # print(time_diff)
     # 2 Lists for Results, because time is more important than memory
     if extend_session:
         # ? Test for edge cases
@@ -129,6 +129,7 @@ def main():
         person_data = list()
         all_encodings = list()
         vis_data = gui.plots.vis_data()
+    persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
 
     # print("go gui")
     # gui_running = gui.guiRunning.Application()
@@ -169,7 +170,7 @@ def main():
             t += 1
             print("no facesdetected")
             continue
-        #gui_running.alpha(vis_data)
+        # gui_running.alpha(vis_data)
         #print(f"{len(curr_encodings)} Faces detected")
         # inference
         # Returns array of shape [num_targets=4, num_persons, num_classes=4]
@@ -187,7 +188,7 @@ def main():
         try:
             longest_t = max([len(person[0]) for person in person_data])
             longest_t = max([longest_t, t])
-        except:
+        except BaseException:
             longest_t = t
 
         # match encodings & metrics
@@ -196,8 +197,8 @@ def main():
                 person_data, person_preds, all_encodings, curr_encodings, longest_t)
 
         # TODO update gui with plots
-        #gui_running.alpha(vis_data)
-        #print(vis_data.data)
+        # gui_running.alpha(vis_data)
+        # print(vis_data.data)
 
         t += 1
         print("l T: ", longest_t)
@@ -213,7 +214,7 @@ def main():
             print("wakey")
         else:
             print("Processing this iteration took longer than inference interval.")
-        #gui_running.alpha(vis_data)
+        # gui_running.alpha(vis_data)
     # ? save data (only at end or in fixed intervalls?)
     person_data = fill_up_inference_data(person_data, longest_t + 1)
     print(f"Len Endings save: {len(all_encodings)}")

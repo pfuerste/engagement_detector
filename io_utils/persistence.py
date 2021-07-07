@@ -51,7 +51,7 @@ def get_latest_session_path(sessions_root, name):
     Returns:
         str: path of latest dir
     """
-    if not os.path.isdir(os.path.join(sessions_root, name)):
+    if not os.path.isdir(os.path.join(sessions_root, name)) or not os.listdir(os.path.join(sessions_root, name)):
         return []
     return get_sorted_session_paths(sessions_root, name)[-1]
 
