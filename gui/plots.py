@@ -3,6 +3,10 @@ import numpy as np
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 from tkinter import *
+import sys, os
+sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('.'))
+from io_utils.persistence import get_sorted_session_paths, load_last_session, load_all_sessions
 
 
 class vis_data():
@@ -52,7 +56,9 @@ class vis_data():
         return self.avg_boredom[-1], self.avg_engagement[-1], \
             self.avg_confusion[-1], self.avg_frustration[-1]
 
+    # intra-session plotting
     def get_avg_plots(self, window):
+        # TODO "Alarm" for slackers
         if window.widget:
             print("destroyed")
             window.widget.destroy()
@@ -88,19 +94,30 @@ class vis_data():
         # print(type(fig))
         # plt.show()
 
-    # def get_avg_plots(self):
-    #     fig, ax0, ax1 = self.fig_avg, self.ax0_avg, self.ax1_avg
-    #     return fig, ax0, ax1
 
-    def test_fig(self):
-        fig, ax0, ax1 = self.get_avg_plots()
-        # fig.canvas.draw()
-        # plt.show()
-        # fig.show()
-        fig.show(fig)
+# inter-session plotting
+class inter_session():
 
+    def __init__(self, log_dir, lecture_name):
+        self.sessions_data = load_all_sessions(log_dir, lecture_name, True)
+        self.sessions_vis_data = []
+        self.avg_boredom = []
+        self.avg_engagement = []
+        self.avg_confusion = []
+        self.avg_frustration = []
+        for ids, scores in self.sessions_data:
+            _vis_data = vis_data()
+            _vis_data.reload_old_data(scores)
+            self.sessions.vis_data.append(_vis_data)
+        for vis_data in self.sessions_vis_data:
+            self.avg_boredom.extend(vis_data.avg_boredom)
+            self.avg_engagement.extend(vis_data.avg_engagement)
+            self.avg_confusion.extend(vis_data.avg_confusion)
+            self.avg_frustration.extend(vis_data.avg_frustration)
 
-# TODO plots
-# intra-session
+    def get_avg_plots():
+        pass
 
-# inter-session
+if __name__ == "__main__":
+    sess = inter_session(r"C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs", "Test")
+    print(sess.session_paths)
