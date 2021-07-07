@@ -22,19 +22,33 @@ class vis_data():
         if scores.size == 0:
             # Else reloading on empty data crashes
             return
+        print(scores.shape)
         data = np.swapaxes(scores, 0, 1)
         data = np.swapaxes(data, 1, 2)
         data = [[[p for p in emotion] for emotion in t] for t in data]
         self.data = data
+        print(data)
         for t in range(len(data[0])):
-            self.avg_boredom.append(sum([x for x in data[0][t] if x != -1]) /
-                                    len([x for x in data[0][t] if x != -1]))
-            self.avg_engagement.append(sum([x for x in data[1][t] if x != -1]) /
+            try:
+                self.avg_boredom.append(sum([x for x in data[0][t] if x != -1]) /
+                                        len([x for x in data[0][t] if x != -1]))
+            except ZeroDivisionError:
+                self.avg_boredom.append(-1)
+            try:
+                self.avg_engagement.append(sum([x for x in data[1][t] if x != -1]) /
                                        len([x for x in data[1][t] if x != -1]))
-            self.avg_confusion.append(sum([x for x in data[2][t] if x != -1]) /
+            except ZeroDivisionError:
+                self.avg_engagement.append(-1)
+            try:
+                self.avg_confusion.append(sum([x for x in data[2][t] if x != -1]) /
                                       len([x for x in data[2][t] if x != -1]))
-            self.avg_frustration.append(sum([x for x in data[3][t] if x != -1]) /
+            except ZeroDivisionError:
+                self.avg_confusion.append(-1)
+            try:
+                self.avg_frustration.append(sum([x for x in data[3][t] if x != -1]) /
                                         len([x for x in data[3][t] if x != -1]))
+            except ZeroDivisionError:
+                self.avg_frustration.append(-1)
 
     def append_data(self, new_data):
         for i, emo_data in enumerate(new_data):
