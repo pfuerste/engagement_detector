@@ -110,8 +110,7 @@ def save_session(save_in, ids, scores, keep=1.0):
     np.save(os.path.join(dir, "scores.npy"), scores)
 
 
-def load_all_sessions(sessions_root, name):
-    # TODO as_lists? Is this function needed later?
+def load_all_sessions(sessions_root, name, as_lists=False):
     """Loads ALL previous sessions of the lecture into memory.
        Memory consumption in Byte for one session: N*(128*sizeof(float)+T*4*sizeof(float))
 
@@ -125,6 +124,9 @@ def load_all_sessions(sessions_root, name):
     session_paths = get_sorted_session_paths(sessions_root, name)
     ids = [np.load(os.path.join(x, "ids.npy"), allow_pickle=True) for x in session_paths]
     scores = [np.load(os.path.join(x, "scores.npy"), allow_pickle=True) for x in session_paths]
+    if as_lists:
+        ids = [[list(person) for person in session] for session in ids]
+        scores = [[[list(emotion) for emotion in person] for person in session] for session in scores]
     return ids, scores
 
 
