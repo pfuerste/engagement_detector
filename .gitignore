@@ -130,3 +130,36 @@ dmypy.json
 
 # IDE-stuff
 .vscode/
+colab_logs/checkpoints.hdf5
+colab_logs/events.out.tfevents.1624535980.8b61627dc2d7
+colab_logs/events.out.tfevents.1624536516.8b61627dc2d7
+colab_logs/events.out.tfevents.1624536553.8b61627dc2d7.profile-empty
+colab_logs/events.out.tfevents.1624537431.8b61627dc2d7
+colab_logs/plugins/profile/2021_06_24_12_09_13/8b61627dc2d7.input_pipeline.pb
+colab_logs/plugins/profile/2021_06_24_12_09_13/8b61627dc2d7.kernel_stats.pb
+colab_logs/plugins/profile/2021_06_24_12_09_13/8b61627dc2d7.memory_profile.json.gz
+colab_logs/plugins/profile/2021_06_24_12_09_13/8b61627dc2d7.overview_page.pb
+colab_logs/plugins/profile/2021_06_24_12_09_13/8b61627dc2d7.tensorflow_stats.pb
+colab_logs/plugins/profile/2021_06_24_12_09_13/8b61627dc2d7.trace.json.gz
+colab_logs/plugins/profile/2021_06_24_12_09_13/8b61627dc2d7.xplane.pb
+colab_logs/plugins/profile/2021_06_24_12_24_04/8b61627dc2d7.input_pipeline.pb
+colab_logs/plugins/profile/2021_06_24_12_24_04/8b61627dc2d7.kernel_stats.pb
+colab_logs/plugins/profile/2021_06_24_12_24_04/8b61627dc2d7.memory_profile.json.gz
+colab_logs/plugins/profile/2021_06_24_12_24_04/8b61627dc2d7.overview_page.pb
+colab_logs/plugins/profile/2021_06_24_12_24_04/8b61627dc2d7.tensorflow_stats.pb
+colab_logs/plugins/profile/2021_06_24_12_24_04/8b61627dc2d7.trace.json.gz
+colab_logs/plugins/profile/2021_06_24_12_24_04/8b61627dc2d7.xplane.pb
+cnn/models/untuned_final_func.hdf5
+io_utils/data_in/chess.jpg
+io_utils/data_in/easy_vid0.mp4
+io_utils/data_in/hard_face0.jpg
+io_utils/data_in/hard_face1.jpg
+io_utils/data_in/hard_face2.jpg
+io_utils/data_in/hard_vid0.mp4
+io_utils/data_in/pic_1031_35.7.png
+io_utils/data_in/zoom_ui.jpg
+io_utils/data_in/zoom_ui2.png
+reports/bericht1.html
+reports/bericht1.md
+reports/Meilensteinbericht 1 (zum 25.5.21).pdf
+.gitignore
