@@ -1,0 +1,12 @@
+dlib
+face-recognition
+face-recognition-models
+imageio
+Keras
+Keras-Preprocessing
+matplotlib
+numpy
+pandas
+tensorflow
+tensorflow-estimator
+tqdm

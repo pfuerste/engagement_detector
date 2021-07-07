@@ -1,0 +1,5 @@
+root: /content/engagement_detector
+epochs: 100
+steps: 50
+val_steps: 20
+batch_size: 32
