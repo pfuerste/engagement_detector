@@ -1,6 +1,7 @@
 import os
 import time
 import numpy as np
+import sys
 from face_recognition.api import face_encodings, compare_faces
 import yaml
 import keras
@@ -173,7 +174,16 @@ def main():
             print("wakey")
         else:
             print("Processing this iteration took longer than inference interval.")
-      end=True
+      
+
+      person_data = fill_up_inference_data(person_data, longest_t + 1)
+      persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+      print(f"Len Endings save: {len(all_encodings)}")
+      print(f"data save: {person_data}")
+      print("Ich komme bis hier")
+      time.sleep(5)
+      os._exit(1)
+
       #sys.exit()
         #gui_running.alpha(vis_data)
     # ? save data (only at end or in fixed intervalls?)
@@ -237,13 +247,8 @@ def main():
     t1=threading.Thread(target=run,args=(t,vis_data,session_duration,person_data,all_encodings,gui_running))
     t1.start()
     
-    if end==True:
-        person_data = fill_up_inference_data(person_data, longest_t + 1)
-        print(f"Len Endings save: {len(all_encodings)}")
-        print(f"data save: {person_data}")
-        print(f"data save shape: {np.array(person_data).shape}")
-
-        persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+    #if end==True:
+            
     gui_running.mainloop()
 
 

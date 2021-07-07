@@ -1,4 +1,5 @@
 from tkinter import *
+import sys
 # from .plots import get_avg_plots
 
 
@@ -22,9 +23,9 @@ class Application(Frame):
     def getEnde(self):
         return self.ende
 
-    def ende(self):
+    def Sende(self):
         self.ende=True
-        print("Status" + self.ende)
+        #self.quit()
 
     def initUI(self):
         self.pack(fill=BOTH, expand=1)
@@ -32,7 +33,7 @@ class Application(Frame):
         plotbutton = Button(self, text="Plot Data", command=self.alpha)
         plotbutton.place(relx=0.2, rely=0.9)
 
-        quitbutton = Button(self, text="Quit", command=self.ende)
+        quitbutton = Button(self, text="Quit", command=self.Sende)
         quitbutton.place(relx=0.6, rely=0.9)
 
     def alpha(self, vis_data):
