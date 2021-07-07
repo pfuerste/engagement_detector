@@ -17,6 +17,16 @@ import gui.guiStart
 
 
 def fill_up_inference_data(inferences, t, index=None):
+    """Extend lists with -1s up to current t
+
+    Args:
+        inferences (list): person_data
+        t (int): current timestep
+        index (int, optional): Only fills person at index if true. Defaults to None.
+
+    Returns:
+        [type]: [description]
+    """
     for i, single_data in enumerate(inferences):
         if index and i != index:
             # Make this function usable for filling up single persons too
@@ -30,7 +40,6 @@ def fill_up_inference_data(inferences, t, index=None):
 
 
 def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings, t):
-    # TODO Test for change of positions
     # Manage early timesteps
     # Initialize structures in first time step if faces were found
     if t == 0 and curr_encodings and not all_encodings:
@@ -168,10 +177,10 @@ def main():
         if not faces:
             longest_t = t
             t += 1
-            print("no facesdetected")
+            print("no faces detected")
             continue
         # gui_running.alpha(vis_data)
-        #print(f"{len(curr_encodings)} Faces detected")
+        # print(f"{len(curr_encodings)} Faces detected")
         # inference
         # Returns array of shape [num_targets=4, num_persons, num_classes=4]
         probs = model.predict(batchify(faces))
