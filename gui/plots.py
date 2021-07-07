@@ -74,7 +74,6 @@ class vis_data():
         #canvas.draw()
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
-        print(window.widget)
         #toolbar = NavigationToolbar2Tk(canvas, window)
         #toolbar.update()
         #canvas.get_tk_widget().pack()

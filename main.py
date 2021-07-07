@@ -114,7 +114,7 @@ def main():
     # If the last session was less than session_duration ago, use that sessions data (probably crash/pause)
     time_diff = persistence.last_session_difference(log_dir, lecture_name)
     extend_session = False if time_diff > session_duration else True
-    print(time_diff)
+    #print(time_diff)
     # 2 Lists for Results, because time is more important than memory
     if extend_session:
         # ? Test for edge cases
@@ -129,9 +129,9 @@ def main():
         all_encodings = list()
         vis_data = gui.plots.vis_data()
 
-    print("go gui")
-    gui_running = gui.guiRunning.Application()
-    print("gui called")
+    # print("go gui")
+    # gui_running = gui.guiRunning.Application()
+    # print("gui called")
 
     # TODO get from intra-session ui
     stop = False
@@ -169,7 +169,7 @@ def main():
             print("no facesdetected")
             continue
         #gui_running.alpha(vis_data)
-        print(f"{len(curr_encodings)} Faces detected")
+        #print(f"{len(curr_encodings)} Faces detected")
         # inference
         # Returns array of shape [num_targets=4, num_persons, num_classes=4]
         probs = model.predict(batchify(faces))
