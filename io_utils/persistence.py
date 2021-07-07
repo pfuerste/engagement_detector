@@ -25,8 +25,7 @@ def get_current_session_path(sessions_root, name):
     """Returns session_root/name/x with x being an identifier of the current time.
        Creates that dir if not present.
        Call at the beginning of a session.
-       ! In case of crash/interruption, if a new hour started since the beginning of
-       the lecture, a lecture-instance will be created on restart. !
+
     Args:
         sessions_root (str): path for data of all data
         name (str): lecture name, will be subdir in sessions_root
@@ -149,6 +148,15 @@ def load_last_session(sessions_root, name, as_lists=False):
 
 
 def last_session_difference(sessions_root, name):
+    """Returns time since last session of name started.
+
+    Args:
+        sessions_root (str): path for data of all lectures
+        name (str): lecture name
+
+    Returns:
+        float: time in minutes
+    """
     if not get_latest_session_path(sessions_root, name):
         return np.inf
     now = datetime.now()
