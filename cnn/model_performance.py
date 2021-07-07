@@ -24,10 +24,15 @@ def test_model(model, generator, num=1):
 
     # Loop over the generator
     for data, label in generator:
-        b_labels.extend(label[0])
-        e_labels.extend(label[1])
-        c_labels.extend(label[2])
-        f_labels.extend(label[3])
+        b_labels.extend([l[0] for l in label])
+        e_labels.extend([l[1] for l in label])
+        c_labels.extend([l[2] for l in label])
+        f_labels.extend([l[3] for l in label])
+
+        # b_labels.extend(np.argmax(label[0], axis=1))
+        # e_labels.extend(np.argmax(label[1], axis=1))
+        # c_labels.extend(np.argmax(label[2], axis=1))
+        # f_labels.extend(np.argmax(label[3], axis=1))
 
         # Make predictions on data using the model. Store the results.
         preds = model.predict(data)
@@ -41,9 +46,9 @@ def test_model(model, generator, num=1):
         if len(b_predictions) == num * 32:
             break
 
-    print(list(zip(b_labels, b_predictions)))
-    print(list(zip(e_labels, e_predictions)))
-
+    # print(list(zip(b_labels, b_predictions)))
+    # print(list(zip(e_labels, e_predictions)))
+    # print(len(b_labels), len(b_predictions))
     b_acc = accuracy_score(b_labels, b_predictions)
     b_mse = mean_squared_error(b_labels, b_predictions)
     print(f"b_acc: {b_acc}")
@@ -83,4 +88,4 @@ if __name__ == "__main__":
     test_df = dai.get_dataframe("Test")
     test_datagen = dai.get_flowing_datagen(dai.get_datagen(), test_df, "Test", (64, 64))
 
-    test_model(model, test_datagen, 17000/32)
+    test_model(model, test_datagen, 500)
