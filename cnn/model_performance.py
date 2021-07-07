@@ -4,7 +4,7 @@ import yaml
 import tqdm
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import confusion_matrix, accuracy_score, mean_squared_error
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('.'))
 from models import get_model, get_func_model
@@ -45,21 +45,32 @@ def test_model(model, generator, num=1):
     print(list(zip(e_labels, e_predictions)))
 
     b_acc = accuracy_score(b_labels, b_predictions)
-    print(b_acc)
+    b_mse = mean_squared_error(b_labels, b_predictions)
+    print(f"b_acc: {b_acc}")
+    print(f"b_mse: {b_mse}")
     b_matrix = confusion_matrix(b_labels, b_predictions, labels=[0, 1, 2, 3])
-    print(b_matrix)
+    # print(b_matrix)
+
     e_acc = accuracy_score(e_labels, e_predictions)
-    print(e_acc)
+    e_mse = mean_squared_error(e_labels, e_predictions)
+    print(f"e_acc: {e_acc}")
+    print(f"e_mse: {e_mse}")
     e_matrix = confusion_matrix(e_labels, e_predictions, labels=[0, 1, 2, 3])
-    print(e_matrix)
+    # print(e_matrix)
+
     f_acc = accuracy_score(f_labels, f_predictions)
-    print(f_acc)
+    f_mse = mean_squared_error(f_labels, f_predictions)
+    print(f"f_acc: {f_acc}")
+    print(f"f_mse: {f_mse}")
     f_matrix = confusion_matrix(f_labels, f_predictions, labels=[0, 1, 2, 3])
-    print(f_matrix)
+    # print(f_matrix)
+
     c_acc = accuracy_score(c_labels, c_predictions)
-    print(c_acc)
+    c_mse = mean_squared_error(c_labels, c_predictions)
+    print(f"c_acc: {c_acc}")
+    print(f"c_mse: {c_mse}")
     c_matrix = confusion_matrix(c_labels, c_predictions, labels=[0, 1, 2, 3])
-    print(c_matrix)
+    # print(c_matrix)
 
 
 if __name__ == "__main__":
@@ -67,14 +78,9 @@ if __name__ == "__main__":
     data_root = yaml.safe_load(open("config.yml"))["data_root"]
     model_dir = os.path.join(root, "cnn", "models")
     model = get_func_model()
-    model.load_weights(os.path.join(model_dir, "checkpoints_func.hdf5"))
+    model.load_weights(os.path.join(model_dir, "untuned_final_func.hdf5"))
 
     test_df = dai.get_dataframe("Test")
-    test_datagen = dai.get_flowing_datagen(dai.get_datagen(), test_df, "Test")
-
-    #TODO Fix reihenfolge überall sonst
-    #TODO  fix klassenimbalance
-    #TODO größere bilder
-    #TODO Trainiere neu
+    test_datagen = dai.get_flowing_datagen(dai.get_datagen(), test_df, "Test", (64, 64))
 
     test_model(model, test_datagen, 17000/32)

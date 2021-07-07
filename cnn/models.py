@@ -269,6 +269,7 @@ def get_func_model(input_shape=(64, 64, 3)):
     optimizer = optimizers.Adam()
     model = Model(inputs=inp, outputs=[b5, e5, c5, f5])
 
+    # ! Falscher Loss?
     model.compile(optimizer=optimizer,
                   loss={"Boredom": 'sparse_categorical_crossentropy',
                         "Engagement": 'sparse_categorical_crossentropy',
