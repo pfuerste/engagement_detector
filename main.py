@@ -12,6 +12,7 @@ from io_utils.utils import crop_bbs
 import io_utils.screen_grab
 from cnn.models import get_func_model, batchify
 import gui.plots
+import gui.guiRunning
 import gui.guiStart
 
 
@@ -87,7 +88,7 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
 
 
 # ! Errors:
-# ! - Reloading after no faces in lecture (ignore)
+# ! - Reloading after no faces in lecture (ignore: only relevant while debugging)
 def main():
     # read config (developer info)
     root = yaml.safe_load(open("config.yml"))["root"]
@@ -105,7 +106,7 @@ def main():
     # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
     # performance_mode = gui_start.PerformanceMode
     # session_duration = gui_start.Duration
-    lecture_name = "Test3"
+    lecture_name = "Test2"
     input_via = io_utils.screen_grab.screenshot
     performance_mode = False
     session_duration = 90
@@ -128,9 +129,9 @@ def main():
         all_encodings = list()
         vis_data = gui.plots.vis_data()
 
-    print(f"Len Endings start: {len(all_encodings)}")
-    print(f"data start: {person_data}")
-    print(f"data start shape: {np.array(person_data).shape}")
+    print("go gui")
+    gui_running = gui.guiRunning.Application()
+    print("gui called")
 
     # TODO get from intra-session ui
     stop = False
@@ -138,7 +139,7 @@ def main():
     # loop while (not stop button pressed)
     # TODO while not stop:
     # TODO all functions have to work with zero faces too
-    for j in range(1):
+    for j in range(5):
         iter_start = time.perf_counter()
         imgs = input_via()
         print("image taken")
@@ -167,7 +168,8 @@ def main():
             t += 1
             print("no facesdetected")
             continue
-        print("Face detected")
+        #gui_running.alpha(vis_data)
+        print(f"{len(curr_encodings)} Faces detected")
         # inference
         # Returns array of shape [num_targets=4, num_persons, num_classes=4]
         probs = model.predict(batchify(faces))
@@ -191,7 +193,10 @@ def main():
         if not performance_mode:
             person_data, all_encodings = manage_encodings(
                 person_data, person_preds, all_encodings, curr_encodings, longest_t)
+
         # TODO update gui with plots
+        gui_running.alpha(vis_data)
+        #print(vis_data.data)
 
         t += 1
         print("l T: ", longest_t)
@@ -207,6 +212,7 @@ def main():
             print("wakey")
         else:
             print("Processing this iteration took longer than inference interval.")
+        #gui_running.alpha(vis_data)
     # ? save data (only at end or in fixed intervalls?)
     person_data = fill_up_inference_data(person_data, longest_t + 1)
     print(f"Len Endings save: {len(all_encodings)}")

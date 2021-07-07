@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
-
+from tkinter import *
 
 class vis_data():
     """Saves data for visualization to not do calculations more often
@@ -49,6 +49,10 @@ class vis_data():
             self.avg_confusion[-1], self.avg_frustration[-1]
 
     def get_avg_plots(self, window):
+        if window.widget:
+            print("destroyed")
+            window.widget.destroy()
+        
         # break if used without data
         if not self.avg_boredom:
             fig, (ax0, ax1) = plt.subplots(2, 1)
@@ -65,13 +69,15 @@ class vis_data():
             ax1.plot(self.avg_engagement, c="green")
             ax1.plot(self.avg_confusion, c="purple")
             ax1.plot(self.avg_frustration, c="red")
-
-        canvas = FigureCanvasTkAgg(fig, master=window)
-        canvas.draw()
-        canvas.get_tk_widget().pack()
-        toolbar = NavigationToolbar2Tk(canvas, window)
-        toolbar.update()
-        canvas.get_tk_widget().pack()
+        #plt.show()
+        canvas = FigureCanvasTkAgg(fig, master=window.root)
+        #canvas.draw()
+        window.widget = canvas.get_tk_widget()
+        window.widget.pack(fill=BOTH)
+        print(window.widget)
+        #toolbar = NavigationToolbar2Tk(canvas, window)
+        #toolbar.update()
+        #canvas.get_tk_widget().pack()
         #self.fig_avg = fig
         #self.ax0_avg = ax0
         #self.ax1_avg = ax1
@@ -79,9 +85,9 @@ class vis_data():
         #print(type(fig))
         #plt.show()
 
-    def get_avg_plots(self):
-        fig, ax0, ax1 = self.fig_avg, self.ax0_avg, self.ax1_avg
-        return fig, ax0, ax1
+    # def get_avg_plots(self):
+    #     fig, ax0, ax1 = self.fig_avg, self.ax0_avg, self.ax1_avg
+    #     return fig, ax0, ax1
 
     def test_fig(self):
         fig, ax0, ax1 = self.get_avg_plots()
@@ -89,6 +95,7 @@ class vis_data():
         #plt.show()
         #fig.show()
         fig.show(fig)
+
 
 # TODO plots
 # intra-session
