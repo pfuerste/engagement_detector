@@ -14,6 +14,8 @@ from cnn.models import get_func_model, batchify
 import gui.plots
 import gui.guiRunning
 import gui.guiStart
+import threading
+from tkinter import *
 
 
 def fill_up_inference_data(inferences, t, index=None):
@@ -90,56 +92,13 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
 # ! Errors:
 # ! - Reloading after no faces in lecture (ignore: only relevant while debugging)
 def main():
-    # read config (developer info)
-    root = yaml.safe_load(open("config.yml"))["root"]
-    model_path = yaml.safe_load(open("config.yml"))["model"]
-    log_dir = yaml.safe_load(open("config.yml"))["logs"]
-    interval = int(yaml.safe_load(open("config.yml"))["inference_interval"])
 
-    # load model
-    model = get_func_model()
-    model.load_weights(model_path)
-
-    # read from gui:
-    # gui_start = gui.guiStart.guiStart()
-    # lecture_name = gui_start.LectureName
-    # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
-    # performance_mode = gui_start.PerformanceMode
-    # session_duration = gui_start.Duration
-    lecture_name = "Test2"
-    input_via = io_utils.screen_grab.screenshot
-    performance_mode = False
-    session_duration = 90
-
-    # If the last session was less than session_duration ago, use that sessions data (probably crash/pause)
-    time_diff = persistence.last_session_difference(log_dir, lecture_name)
-    extend_session = False if time_diff > session_duration else True
-    print(time_diff)
-    # 2 Lists for Results, because time is more important than memory
-    if extend_session:
-        # ? Test for edge cases
-        save_in = persistence.get_latest_session_path(log_dir, lecture_name)
-        all_encodings, person_data = persistence.load_last_session(log_dir, lecture_name, as_lists=True)
-        # print(f"loaded array: \n{person_data}")
-        vis_data = gui.plots.vis_data()
-        vis_data.reload_old_data(person_data)
-    else:
-        save_in = persistence.get_current_session_path(log_dir, lecture_name)
-        person_data = list()
-        all_encodings = list()
-        vis_data = gui.plots.vis_data()
-
-    print("go gui")
-    gui_running = gui.guiRunning.Application()
-    print("gui called")
-
-    # TODO get from intra-session ui
-    stop = False
-    t = 0
-    # loop while (not stop button pressed)
-    # TODO while not stop:
-    # TODO all functions have to work with zero faces too
-    for j in range(5):
+    def run(t,vis_data,session_duration,person_data,all_encodings,gui_running):
+      
+      model = get_func_model()
+      model.load_weights(model_path)
+      model._make_predict_function()
+      while not gui_running.getEnde():
         iter_start = time.perf_counter()
         imgs = input_via()
         print("image taken")
@@ -172,6 +131,7 @@ def main():
         print(f"{len(curr_encodings)} Faces detected")
         # inference
         # Returns array of shape [num_targets=4, num_persons, num_classes=4]
+        #print(model.summary())
         probs = model.predict(batchify(faces))
 
         probs = np.array(probs)
@@ -179,6 +139,7 @@ def main():
         preds = probs.argmax(axis=2)
         person_preds = preds.T
 
+        print("Check")
         # Update visualization data
         vis_data.append_data(preds)
 
@@ -212,14 +173,78 @@ def main():
             print("wakey")
         else:
             print("Processing this iteration took longer than inference interval.")
+      end=True
+      #sys.exit()
         #gui_running.alpha(vis_data)
     # ? save data (only at end or in fixed intervalls?)
-    person_data = fill_up_inference_data(person_data, longest_t + 1)
-    print(f"Len Endings save: {len(all_encodings)}")
-    print(f"data save: {person_data}")
-    print(f"data save shape: {np.array(person_data).shape}")
 
-    persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+    # read config (developer info)
+    root = yaml.safe_load(open("config.yml"))["root"]
+    model_path = yaml.safe_load(open("config.yml"))["model"]
+    log_dir = yaml.safe_load(open("config.yml"))["logs"]
+    interval = int(yaml.safe_load(open("config.yml"))["inference_interval"])
+    end=False;
+
+    # load model
+    model = get_func_model()
+    model.load_weights(model_path)
+    model._make_predict_function()
+
+    # read from gui:
+    # gui_start = gui.guiStart.guiStart()
+    # lecture_name = gui_start.LectureName
+    # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
+    # performance_mode = gui_start.PerformanceMode
+    # session_duration = gui_start.Duration
+    lecture_name = "Test2"
+    input_via = io_utils.screen_grab.screenshot
+    performance_mode = False
+    session_duration = 90
+
+    # If the last session was less than session_duration ago, use that sessions data (probably crash/pause)
+    time_diff = persistence.last_session_difference(log_dir, lecture_name)
+    extend_session = False if time_diff > session_duration else True
+    print(time_diff)
+    # 2 Lists for Results, because time is more important than memory
+    if extend_session:
+        # ? Test for edge cases
+        save_in = persistence.get_latest_session_path(log_dir, lecture_name)
+        all_encodings, person_data = persistence.load_last_session(log_dir, lecture_name, as_lists=True)
+        # print(f"loaded array: \n{person_data}")
+        vis_data = gui.plots.vis_data()
+        vis_data.reload_old_data(person_data)
+    else:
+        save_in = persistence.get_current_session_path(log_dir, lecture_name)
+        person_data = list()
+        all_encodings = list()
+        vis_data = gui.plots.vis_data()
+
+    print("go gui")
+    root=Tk()
+    root.title("Engagement Detector")
+    root.geometry("450x550+0+0")
+    gui_running = gui.guiRunning.Application(master=root)
+    #t1=threading.Thread(target=gui_running.mainloop)
+    #t1.start()
+    print("gui called")
+
+    # TODO get from intra-session ui
+    stop = False
+    t = 0
+    # loop while (not stop button pressed)
+    # TODO while not stop:
+    # TODO all functions have to work with zero faces too
+    t1=threading.Thread(target=run,args=(t,vis_data,session_duration,person_data,all_encodings,gui_running))
+    t1.start()
+    
+    if end==True:
+        person_data = fill_up_inference_data(person_data, longest_t + 1)
+        print(f"Len Endings save: {len(all_encodings)}")
+        print(f"data save: {person_data}")
+        print(f"data save shape: {np.array(person_data).shape}")
+
+        persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+    gui_running.mainloop()
 
 
 if __name__ == "__main__":
