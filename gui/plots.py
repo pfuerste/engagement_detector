@@ -4,6 +4,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 from tkinter import *
 
+
 class vis_data():
     """Saves data for visualization to not do calculations more often
     than needed for live plotting.
@@ -18,6 +19,9 @@ class vis_data():
 
     def reload_old_data(self, person_data):
         scores = np.array(person_data)
+        if scores.size == 0:
+            # Else reloading on empty data crashes
+            return
         data = np.swapaxes(scores, 0, 1)
         data = np.swapaxes(data, 1, 2)
         data = [[[p for p in emotion] for emotion in t] for t in data]
@@ -52,7 +56,7 @@ class vis_data():
         if window.widget:
             print("destroyed")
             window.widget.destroy()
-        
+
         # break if used without data
         if not self.avg_boredom:
             fig, (ax0, ax1) = plt.subplots(2, 1)
@@ -69,20 +73,20 @@ class vis_data():
             ax1.plot(self.avg_engagement, c="green")
             ax1.plot(self.avg_confusion, c="purple")
             ax1.plot(self.avg_frustration, c="red")
-        #plt.show()
+        # plt.show()
         canvas = FigureCanvasTkAgg(fig, master=window.root)
-        #canvas.draw()
+        # canvas.draw()
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
         #toolbar = NavigationToolbar2Tk(canvas, window)
-        #toolbar.update()
-        #canvas.get_tk_widget().pack()
+        # toolbar.update()
+        # canvas.get_tk_widget().pack()
         #self.fig_avg = fig
         #self.ax0_avg = ax0
         #self.ax1_avg = ax1
-        #plt.close()
-        #print(type(fig))
-        #plt.show()
+        # plt.close()
+        # print(type(fig))
+        # plt.show()
 
     # def get_avg_plots(self):
     #     fig, ax0, ax1 = self.fig_avg, self.ax0_avg, self.ax1_avg
@@ -90,9 +94,9 @@ class vis_data():
 
     def test_fig(self):
         fig, ax0, ax1 = self.get_avg_plots()
-        #fig.canvas.draw()
-        #plt.show()
-        #fig.show()
+        # fig.canvas.draw()
+        # plt.show()
+        # fig.show()
         fig.show(fig)
 
 

@@ -88,7 +88,8 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
 
 
 # ! Errors:
-# ! - Reloading after no faces in lecture (ignore: only relevant while debugging)
+# ! When program crashes bevor data gets saved ->
+# TODO save empty dummy in beginning
 def main():
     # read config (developer info)
     root = yaml.safe_load(open("config.yml"))["root"]
@@ -195,7 +196,7 @@ def main():
                 person_data, person_preds, all_encodings, curr_encodings, longest_t)
 
         # TODO update gui with plots
-        gui_running.alpha(vis_data)
+        #gui_running.alpha(vis_data)
         #print(vis_data.data)
 
         t += 1
