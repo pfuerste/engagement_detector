@@ -97,15 +97,16 @@ def save_session(save_in, ids, scores, keep=1.0):
     if scores.ndim == 3 and keep != 1.0:
         scores = sparsify(scores, keep=keep)
     dir = save_in
-    # dir = get_latest_session_path(sessions_root, name)
-    # print([x for x in os.listdir(dir) if ("ids" or "scores") in x])
-    # num = len([x for x in os.listdir(dir) if ("ids" or "scores") in x])/2
 
     # delete half-sessions:
     if os.path.isfile(os.path.join(dir, "ids.npy")):
         os.remove(os.path.join(dir, "ids.npy"))
     if os.path.isfile(os.path.join(dir, "scores.npy")):
         os.remove(os.path.join(dir, "scores.npy"))
+    # Saving after one iteration needs a new dim
+    if scores.ndim == 2:
+        scores = np.expand_dims(scores, axis=2)
+        ids = np.expand_dims(ids, axis=2)
     np.save(os.path.join(dir, "ids.npy"), ids)
     np.save(os.path.join(dir, "scores.npy"), scores)
 
@@ -164,7 +165,7 @@ def last_session_difference(sessions_root, name):
     now = datetime.now()
     old_date = get_latest_session_path(sessions_root, name).split(os.sep)[-1]
     old_date = datetime.strptime(old_date, '%Y%m%d%H%M')
-    time_diff = (now - old_date).total_seconds()/60
+    time_diff = (now - old_date).total_seconds() / 60
     return time_diff
 
 
