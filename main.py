@@ -1,6 +1,7 @@
 import os
 import time
 import numpy as np
+import sys
 from face_recognition.api import face_encodings, compare_faces
 import yaml
 import keras
@@ -14,6 +15,8 @@ from cnn.models import get_func_model, batchify
 import gui.plots
 import gui.guiRunning
 import gui.guiStart
+import threading
+from tkinter import *
 
 
 def fill_up_inference_data(inferences, t, index=None):
@@ -96,10 +99,87 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
     return person_data, all_encodings
 
 
-# ! Errors:
-# ! When program crashes bevor data gets saved ->
-# TODO save empty dummy in beginning
 def main():
+    def run(vis_data, person_data, all_encodings, gui_running):
+        t = 0
+        model = get_func_model()
+        model.load_weights(model_path)
+        model._make_predict_function()
+        while not gui_running.getEnde():
+            iter_start = time.perf_counter()
+            imgs = input_via()
+            print("image taken")
+            # find faces
+            face_locs = list()
+            faces = list()
+            curr_encodings = list()
+            for img in imgs:
+                img = np.array(img)
+                locs = fe.face_recog_extract(img)
+                face_locs.extend(locs)
+                # save encodings and faces
+                for loc in locs:
+                    face = crop_bbs(img, [loc])
+                    faces.append(*face)
+                    if not performance_mode:
+                        if not faces:
+                            longest_t = t
+                            t += 1
+                            continue
+                        # Does not find encodings on just face, needs to take whole image
+                        enc = face_recognition.face_encodings(img, [loc])
+                        curr_encodings.append(enc[0])
+            if not faces:
+                longest_t = t
+                t += 1
+                print("no faces detected")
+                continue
+
+            probs = model.predict(batchify(faces))
+            probs = np.array(probs)
+            # Reshape to [num_targets=4, num_persons] by taking index of max in last dim
+            preds = probs.argmax(axis=2)
+            person_preds = preds.T
+
+            # Update visualization data
+            vis_data.append_data(preds)
+
+            # In case of pause, fill up for whole sequence. Catch for
+            try:
+                longest_t = max([len(person[0]) for person in person_data])
+                longest_t = max([longest_t, t])
+            except BaseException:
+                longest_t = t
+
+            # match encodings & metrics
+            if not performance_mode:
+                person_data, all_encodings = manage_encodings(
+                    person_data, person_preds, all_encodings, curr_encodings, longest_t)
+
+            # TODO update gui with plots
+            gui_running.alpha(vis_data)
+            # print(vis_data.data)
+
+            t += 1
+            iter_end = time.perf_counter()
+            print(f"Processing one image (with {len(face_locs)} found faces) took {(iter_end-iter_start)} seconds.")
+            # Save in certain iterations
+            if t % 5 == 0:
+                person_data = fill_up_inference_data(person_data, longest_t + 1)
+                persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+            if iter_end - iter_start < interval:
+                time.sleep(interval - (iter_end - iter_start))
+            else:
+                print("Processing this iteration took longer than inference interval.")
+
+        person_data = fill_up_inference_data(person_data, longest_t + 1)
+        persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+        # print(f"Len Endings save: {len(all_encodings)}")
+        # print(f"data save: {person_data}")
+        # print("Ich komme bis hier")
+        time.sleep(5)
+        os._exit(1)
+
     # read config (developer info)
     root = yaml.safe_load(open("config.yml"))["root"]
     model_path = yaml.safe_load(open("config.yml"))["model"]
@@ -109,6 +189,7 @@ def main():
     # load model
     model = get_func_model()
     model.load_weights(model_path)
+    model._make_predict_function()
 
     # read from gui:
     # gui_start = gui.guiStart.guiStart()
@@ -124,113 +205,40 @@ def main():
     # If the last session was less than session_duration ago, use that sessions data (probably crash/pause)
     time_diff = persistence.last_session_difference(log_dir, lecture_name)
     extend_session = False if time_diff > session_duration else True
-    # print(time_diff)
+    print(time_diff)
     # 2 Lists for Results, because time is more important than memory
     if extend_session:
         # ? Test for edge cases
         save_in = persistence.get_latest_session_path(log_dir, lecture_name)
-        all_encodings, person_data = persistence.load_last_session(log_dir, lecture_name, as_lists=True)
-        # print(f"loaded array: \n{person_data}")
-        vis_data = gui.plots.vis_data()
-        vis_data.reload_old_data(person_data)
+        try:
+            all_encodings, person_data = persistence.load_last_session(log_dir, lecture_name, as_lists=True)
+            vis_data = gui.plots.vis_data()
+            vis_data.reload_old_data(person_data)
+        except FileNotFoundError:
+            person_data = list()
+            all_encodings = list()
+            vis_data = gui.plots.vis_data()
     else:
         save_in = persistence.get_current_session_path(log_dir, lecture_name)
         person_data = list()
         all_encodings = list()
         vis_data = gui.plots.vis_data()
+
+    # Save incase of ealry crash/pause
     persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
 
-    # print("go gui")
-    # gui_running = gui.guiRunning.Application()
-    # print("gui called")
+    # Call the intra-session gui
+    root = Tk()
+    root.title("Engagement Detector")
+    root.geometry("450x550+0+0")
+    gui_running = gui.guiRunning.Application(master=root)
 
-    # TODO get from intra-session ui
-    stop = False
-    t = 0
-    # loop while (not stop button pressed)
-    # TODO while not stop:
-    # TODO all functions have to work with zero faces too
-    for j in range(5):
-        iter_start = time.perf_counter()
-        imgs = input_via()
-        print("image taken")
-        # find faces
-        face_locs = list()
-        faces = list()
-        curr_encodings = list()
-        for img in imgs:
-            img = np.array(img)
-            locs = fe.face_recog_extract(img)
-            face_locs.extend(locs)
-            # save encodings and faces
-            for loc in locs:
-                face = crop_bbs(img, [loc])
-                faces.append(*face)
-                if not performance_mode:
-                    if not faces:
-                        longest_t = t
-                        t += 1
-                        continue
-                    # Does not find encodings on just face, needs to take whole image
-                    enc = face_recognition.face_encodings(img, [loc])
-                    curr_encodings.append(enc[0])
-        if not faces:
-            longest_t = t
-            t += 1
-            print("no faces detected")
-            continue
-        # gui_running.alpha(vis_data)
-        # print(f"{len(curr_encodings)} Faces detected")
-        # inference
-        # Returns array of shape [num_targets=4, num_persons, num_classes=4]
-        probs = model.predict(batchify(faces))
+    # Start the thread for getting data
+    t1 = threading.Thread(target=run, args=(vis_data, person_data, all_encodings, gui_running))
+    t1.start()
 
-        probs = np.array(probs)
-        # Reshape to [num_targets=4, num_persons] by taking index of max in last dim
-        preds = probs.argmax(axis=2)
-        person_preds = preds.T
-
-        # Update visualization data
-        vis_data.append_data(preds)
-
-        # In case of pause, fill up for whole sequence. Catch for
-        try:
-            longest_t = max([len(person[0]) for person in person_data])
-            longest_t = max([longest_t, t])
-        except BaseException:
-            longest_t = t
-
-        # match encodings & metrics
-        if not performance_mode:
-            person_data, all_encodings = manage_encodings(
-                person_data, person_preds, all_encodings, curr_encodings, longest_t)
-
-        # TODO update gui with plots
-        # gui_running.alpha(vis_data)
-        # print(vis_data.data)
-
-        t += 1
-        print("l T: ", longest_t)
-        iter_end = time.perf_counter()
-        print(f"Processing one image (with {len(face_locs)} found faces) took {(iter_end-iter_start)} seconds.")
-        # Save in certain iterations
-        if t % 5 == 0:
-            person_data = fill_up_inference_data(person_data, longest_t + 1)
-            persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
-        if iter_end - iter_start < interval:
-            print("sleep")
-            time.sleep(interval - (iter_end - iter_start))
-            print("wakey")
-        else:
-            print("Processing this iteration took longer than inference interval.")
-        # gui_running.alpha(vis_data)
-    # ? save data (only at end or in fixed intervalls?)
-    person_data = fill_up_inference_data(person_data, longest_t + 1)
-    print(f"Len Endings save: {len(all_encodings)}")
-    print(f"data save: {person_data}")
-    print(f"data save shape: {np.array(person_data).shape}")
-
-    persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+    # Start the intra-session gui properly
+    gui_running.mainloop()
 
 
 if __name__ == "__main__":
