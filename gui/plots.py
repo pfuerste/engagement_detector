@@ -3,7 +3,8 @@ import numpy as np
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 from tkinter import *
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('.'))
 from io_utils.persistence import get_sorted_session_paths, load_last_session, load_all_sessions
@@ -56,6 +57,12 @@ class vis_data():
         return self.avg_boredom[-1], self.avg_engagement[-1], \
             self.avg_confusion[-1], self.avg_frustration[-1]
 
+    def is_critical_level(self):
+        curr = self.current_avgs()
+        critical = [1 for x in curr if x == 4]
+        critical[1] = 1 if curr[1] == 0 else 0
+        return critical
+
     # intra-session plotting
     def get_avg_plots(self, window):
         # TODO "Alarm" for slackers
@@ -71,28 +78,20 @@ class vis_data():
             ax0.set_ylim(-1, 4)
             ax0.bar(x=["Boredom", "Engagement", "Confusion", "Frustration"],
                     height=self.current_avgs(),
-                    color=["black", "green", "purple", "red"])
-
+                    color=["black", "green", "purple", "red"],
+                    label=["black", "green", "purple", "red"])
+            critical = self.is_critical_level()
+            
             ax1.set_ylim(-1, 4)
             ax1.grid()
             ax1.plot(self.avg_boredom, c="black")
             ax1.plot(self.avg_engagement, c="green")
             ax1.plot(self.avg_confusion, c="purple")
             ax1.plot(self.avg_frustration, c="red")
-        # plt.show()
+        plt.show()
         canvas = FigureCanvasTkAgg(fig, master=window.root)
-        # canvas.draw()
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
-        #toolbar = NavigationToolbar2Tk(canvas, window)
-        # toolbar.update()
-        # canvas.get_tk_widget().pack()
-        #self.fig_avg = fig
-        #self.ax0_avg = ax0
-        #self.ax1_avg = ax1
-        # plt.close()
-        # print(type(fig))
-        # plt.show()
 
 
 # inter-session plotting
@@ -116,7 +115,9 @@ class inter_session():
             self.avg_frustration.extend(vis_data.avg_frustration)
 
     def get_avg_plots():
+        # TODO
         pass
+
 
 if __name__ == "__main__":
     sess = inter_session(r"C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs", "Test")
