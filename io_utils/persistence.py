@@ -123,8 +123,11 @@ def load_all_sessions(sessions_root, name, as_lists=False):
         tuple: of lists, ids and scores, time-sorted
     """
     session_paths = get_sorted_session_paths(sessions_root, name)
+    # print(session_paths)
     ids = [np.load(os.path.join(x, "ids.npy"), allow_pickle=True) for x in session_paths]
     scores = [np.load(os.path.join(x, "scores.npy"), allow_pickle=True) for x in session_paths]
+    # for score in scores:
+    #     print(score.shape)
     if as_lists:
         ids = [[list(person) for person in session] for session in ids]
         scores = [[[list(emotion) for emotion in person] for person in session] for session in scores]
@@ -142,12 +145,15 @@ def load_last_session(sessions_root, name, as_lists=False):
         tuple: ids and scores as arrays or as lists if as_lists
     """
     session_path = get_latest_session_path(sessions_root, name)
-    ids = np.load(os.path.join(session_path, "ids.npy"), allow_pickle=True)
-    scores = np.load(os.path.join(session_path, "scores.npy"), allow_pickle=True)
-    if as_lists:
-        ids = [list(person) for person in ids]
-        scores = [[list(emotion) for emotion in person] for person in scores]
-    return ids, scores
+    try:
+        ids = np.load(os.path.join(session_path, "ids.npy"), allow_pickle=True)
+        scores = np.load(os.path.join(session_path, "scores.npy"), allow_pickle=True)
+        if as_lists:
+            ids = [list(person) for person in ids]
+            scores = [[list(emotion) for emotion in person] for person in scores]
+        return ids, scores
+    except FileNotFoundError:
+        return [], []
 
 
 def last_session_difference(sessions_root, name):

@@ -197,7 +197,7 @@ def main():
     # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
     # performance_mode = gui_start.PerformanceMode
     # session_duration = gui_start.Duration
-    lecture_name = "Test"
+    lecture_name = "Test2"
     input_via = io_utils.screen_grab.screenshot
     performance_mode = False
     session_duration = 0.5
@@ -224,7 +224,6 @@ def main():
         vis_data = gui.plots.Vis_data()
 
 
-
     # Call the intra-session gui
     root = Tk()
     root.title("Engagement Detector")
@@ -244,8 +243,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # time.sleep(60)
-    # main()
+    #time.sleep(60)
+    #main()
     # time.sleep(60)
     # main()
     # start = time.perf_counter()

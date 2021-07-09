@@ -31,7 +31,7 @@ class Application(Frame):
     def initUI(self):
         self.pack(fill=BOTH, expand=1)
 
-        plotbutton = Button(self, text="Plot Data", command=self.alpha)
+        plotbutton = Button(self, text="Plot Data", command=self.theta)
         plotbutton.place(relx=0.2, rely=0.9)
 
         quitbutton = Button(self, text="Quit", command=self.Sende)
@@ -44,4 +44,8 @@ class Application(Frame):
 
     def beta(self, session_data):
         session_data.get_avg_plots(window=self)
+        self.update()
+
+    def theta(self, session_data, emo_id):
+        session_data.get_emotion_plot(self, emo_id)
         self.update()

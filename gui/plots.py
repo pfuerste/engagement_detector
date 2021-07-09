@@ -128,23 +128,23 @@ class Inter_session():
         self.session_lengths = []
 
     def get_avg_plots(self, window):
+        #TODO broken axis for -1s? 
         self.sessions_vis_data = []
         self.avg_boredom = []
         self.avg_engagement = []
         self.avg_confusion = []
         self.avg_frustration = []
-        # Can't create vis_data() here?
-        self._vis_data = Vis_data()
         for scores in self.sessions_data[1]:
-            self._vis_data.reload_old_data(scores)
-            self.sessions_vis_data.append(self._vis_data)
-            self.session_lengths.append(len(self._vis_data.data[0]))
+            _vis_data = Vis_data()
+            _vis_data.reload_old_data(scores)
+            self.sessions_vis_data.append(_vis_data)
+            self.session_lengths.append(len(_vis_data.data[0]))
         for vis_data in self.sessions_vis_data:
+            print(vis_data.avg_boredom)
             self.avg_boredom.extend(vis_data.avg_boredom)
             self.avg_engagement.extend(vis_data.avg_engagement)
             self.avg_confusion.extend(vis_data.avg_confusion)
             self.avg_frustration.extend(vis_data.avg_frustration)
-
         if window.widget:
             window.widget.destroy()
 
@@ -169,10 +169,19 @@ class Inter_session():
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
 
-    def get_emotion_plot(self, emo_ind):
-        fig, ax0 = plt.subplots(1, 1)
-        #for person in self.da 
+    def get_emotion_plot(self, window, emo_ind):
+        self.person_data = []
 
+        for id in self.sessions_data[0]:
+            print(np.array(id).shape)
+        for session in self.sessions_data[1]:
+            print(np.array(session).shape)
+            self.session_lengths.append(np.array(session).shape[-1])
+        # TODO Create BIG array of semester length with -1s whernever someone wasnt there
+        # know how many people: counter = 0, first session: add num_ids; for other session: for encoding, check if already in, else counter++ 
+        # Create array -1s of shape (num_people, all_timesteps)
+        # for session: put person @ its slot
+        fig, ax0 = plt.subplots(1, 1)
 
 if __name__ == "__main__":
     sess = Inter_session(r"C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs", "Test")

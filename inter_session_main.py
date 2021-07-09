@@ -25,7 +25,7 @@ def main():
     # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
     # performance_mode = gui_start.PerformanceMode
     # session_duration = gui_start.Duration
-    lecture_name = "Test"
+    lecture_name = "Test2"
 
     # Call the intra-session gui
     root = Tk()
@@ -33,8 +33,9 @@ def main():
     root.geometry("1000x1000+0+0")
     gui_running = gui.guiRunning.Application(master=root)
 
-    sessions_data = gui.plots.inter_session(log_dir, lecture_name)
-    gui_running.beta(sessions_data)
+    sessions_data = gui.plots.Inter_session(log_dir, lecture_name)
+    #gui_running.beta(sessions_data)
+    gui_running.theta(sessions_data, 0)
 
     # Start the intra-session gui properly
     gui_running.mainloop()
