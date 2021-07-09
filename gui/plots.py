@@ -118,6 +118,7 @@ class Vis_data():
             canvas = FigureCanvasTkAgg(fig, master=window.master)
             window.widget = canvas.get_tk_widget()
             window.widget.pack(fill=BOTH)
+            
 
 
 # inter-session plotting
@@ -171,7 +172,7 @@ class Inter_session():
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
         window.toolbars = canvas._tkcanvas
-        window.widget.pack(fill=BOTH)
+        window.toolbars.pack(fill=BOTH)
 
     def get_emotion_plot(self, window, emo_ind):
         self.person_data = []

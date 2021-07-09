@@ -34,8 +34,8 @@ class Application(Frame):
         #plotbutton = Button(self, text="Plot Data", command=self.theta)
         #plotbutton.place(relx=0.2, rely=0.9)
 
-        quitbutton = Button(self, text="Quit", command=self.Sende, height=2,width=10)
-        quitbutton.pack()
+        quitbutton = Button(self, text="Quit", command=self.Sende, height=2,width=40)
+        quitbutton.pack(side=TOP)
 
     def alpha(self, vis_data):
         vis_data.get_avg_plots(window=self)

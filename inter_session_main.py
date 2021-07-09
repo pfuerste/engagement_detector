@@ -25,7 +25,7 @@ def main():
     # Call the intra-session gui
     root = Tk()
     root.title("Engagement Detector")
-    root.geometry("300x300+0+0")
+    root.geometry("600x500+0+0")
     gui_running = gui.guiRunning.Application(master=root)
 
     sessions_data = gui.plots.Inter_session(log_dir, gui_start.LectureName)

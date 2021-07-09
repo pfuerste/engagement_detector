@@ -76,7 +76,7 @@ class guiStart:
     def start(self):
         self.LectureName = self.LectureNameDropDown.get()
         if (self.DurationEntry.get().isdigit()):
-            self.Duration = self.DurationEntry.get()
+            self.Duration = int(self.DurationEntry.get())
         if self.checkboxPerformance.get() == 1:
             self.PerformanceMode = True
         if self.checkboxWindowgrab.get() == 1:
