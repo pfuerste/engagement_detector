@@ -192,15 +192,15 @@ def main():
     model._make_predict_function()
 
     # read from gui:
-    # gui_start = gui.guiStart.guiStart()
-    # lecture_name = gui_start.LectureName
-    # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
-    # performance_mode = gui_start.PerformanceMode
-    # session_duration = gui_start.Duration
-    lecture_name = "Test2"
-    input_via = io_utils.screen_grab.screenshot
-    performance_mode = False
-    session_duration = 0.5
+    gui_start = gui.guiStart.guiStart(persistence.get_old_lecture_names(log_dir))
+    lecture_name = gui_start.LectureName
+    input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
+    performance_mode = gui_start.PerformanceMode
+    session_duration = gui_start.Duration
+    #lecture_name = "Test2"
+    #input_via = io_utils.screen_grab.screenshot
+    #performance_mode = False
+    #session_duration = 0.5
 
     # If the last session was less than session_duration ago, use that sessions data (probably crash/pause)
     time_diff = persistence.last_session_difference(log_dir, lecture_name)
@@ -227,7 +227,7 @@ def main():
     # Call the intra-session gui
     root = Tk()
     root.title("Engagement Detector")
-    root.geometry("1000x1000+0+0")
+    root.geometry("450x350+0+0")
     gui_running = gui.guiRunning.Application(master=root)
 
 

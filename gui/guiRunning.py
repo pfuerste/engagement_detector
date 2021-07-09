@@ -26,16 +26,16 @@ class Application(Frame):
     def Sende(self):
         self.ende=True
         print("Will close after saving next iteration.")
-        #self.quit()
+        self.quit()
 
     def initUI(self):
         self.pack(fill=BOTH, expand=1)
 
-        plotbutton = Button(self, text="Plot Data", command=self.theta)
-        plotbutton.place(relx=0.2, rely=0.9)
+        #plotbutton = Button(self, text="Plot Data", command=self.theta)
+        #plotbutton.place(relx=0.2, rely=0.9)
 
-        quitbutton = Button(self, text="Quit", command=self.Sende)
-        quitbutton.place(relx=0.6, rely=0.9)
+        quitbutton = Button(self, text="Quit", command=self.Sende, height=2,width=10)
+        quitbutton.pack()
 
     def alpha(self, vis_data):
         vis_data.get_avg_plots(window=self)
