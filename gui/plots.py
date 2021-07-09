@@ -8,6 +8,7 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('.'))
 from io_utils.persistence import get_sorted_session_paths, load_last_session, load_all_sessions
+import face_recognition
 
 
 class Vis_data():
@@ -170,13 +171,27 @@ class Inter_session():
         window.widget.pack(fill=BOTH)
 
     def get_emotion_plot(self, window, emo_ind):
-        self.person_data = []
-
-        for id in self.sessions_data[0]:
-            print(np.array(id).shape)
-        for session in self.sessions_data[1]:
-            print(np.array(session).shape)
+        num_people = 0
+        checked_ids = []
+        for i, (ids, session) in enumerate(zip(self.sessions_data[0], self.sessions_data[1])):
             self.session_lengths.append(np.array(session).shape[-1])
+            if i == 0:
+                checked_ids.extend(ids)
+            else:
+                for j, id in enumerate(ids):
+
+                    ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.3)
+                    # print(ret)
+                    ret = [1 if x else 0 for x in ret]
+                    if sum(ret) == 0:
+                        checked_ids.append(id)
+                    elif sum(ret) == 1:
+                        print("shouldnt happen in this test")
+                        pass
+                    else:
+                        print("Oh SHIT")
+        print(len(checked_ids))
+        print(sum(self.session_lengths))
         # TODO Create BIG array of semester length with -1s whernever someone wasnt there
         # know how many people: counter = 0, first session: add num_ids; for other session: for encoding, check if already in, else counter++ 
         # Create array -1s of shape (num_people, all_timesteps)
