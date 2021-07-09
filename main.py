@@ -231,15 +231,12 @@ def main():
     root.geometry("1000x1000+0+0")
     gui_running = gui.guiRunning.Application(master=root)
 
-    vis_data = gui.plots.vis_data()
-    sessions_data = gui.plots.inter_session(log_dir, lecture_name, vis_data)
-    gui_running.beta(sessions_data)
 
     # Save incase of early crash/pause
     persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
     # Start the thread for getting data
-    # t1 = threading.Thread(target=run, args=(vis_data, person_data, all_encodings, gui_running))
-    # t1.start()
+    t1 = threading.Thread(target=run, args=(vis_data, person_data, all_encodings, gui_running))
+    t1.start()
 
     # Start the intra-session gui properly
     gui_running.mainloop()

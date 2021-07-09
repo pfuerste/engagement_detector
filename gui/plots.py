@@ -106,18 +106,18 @@ class vis_data():
             critical = self.is_critical_level()
             for i, v in enumerate(critical):
                 if v:
-                    ax0.text(x=i-0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
+                    ax0.text(x=i - 0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
 
             ax1.set_ylim(-1, 4)
             ax1.grid()
-            ax1.plot(self.avg_boredom, c="black")
-            ax1.plot(self.avg_engagement, c="green")
-            ax1.plot(self.avg_confusion, c="purple")
-            ax1.plot(self.avg_frustration, c="red")
+            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_boredom, c="black")
+            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_engagement, c="green")
+            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_confusion, c="purple")
+            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_frustration, c="red")
 
-        canvas = FigureCanvasTkAgg(fig, master=window.master)
-        window.widget = canvas.get_tk_widget()
-        window.widget.pack(fill=BOTH)
+            canvas = FigureCanvasTkAgg(fig, master=window.master)
+            window.widget = canvas.get_tk_widget()
+            window.widget.pack(fill=BOTH)
 
 
 # inter-session plotting
@@ -156,20 +156,22 @@ class inter_session():
             fig, ax1 = plt.subplots(1, 1)
             ax1.set_ylim(-1, 4)
             ax1.grid()
-            ax1.plot(self.avg_boredom, c="black")
-            ax1.plot(self.avg_engagement, c="green")
-            ax1.plot(self.avg_confusion, c="purple")
-            ax1.plot(self.avg_frustration, c="red")
-            for time_stamp in self.session_lengths:
-                ax1.axvline(time_stamp, linestyle="dashed")
-            # TODO mark different sessions?
+            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_boredom, c="black")
+            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_engagement, c="green")
+            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_confusion, c="purple")
+            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_frustration, c="red")
+            sess_end = 0
+            for i, time_stamp in enumerate(self.session_lengths):
+                if i == len(self.session_lengths) - 1:
+                    continue
+                sess_end += time_stamp
+                ax1.axvline(x=sess_end, linestyle="dashed")
         canvas = FigureCanvasTkAgg(fig, master=window.master)
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
 
     def get_emotion_plot(self, emo_ind):
         fig, ax0 = plt.subplots(1, 1)
-
 
 
 if __name__ == "__main__":
