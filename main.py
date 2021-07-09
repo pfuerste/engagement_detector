@@ -211,17 +211,17 @@ def main():
         save_in = persistence.get_latest_session_path(log_dir, lecture_name)
         try:
             all_encodings, person_data = persistence.load_last_session(log_dir, lecture_name, as_lists=True)
-            vis_data = gui.plots.vis_data()
+            vis_data = gui.plots.Vis_data()
             vis_data.reload_old_data(person_data)
         except FileNotFoundError:
             person_data = list()
             all_encodings = list()
-            vis_data = gui.plots.vis_data()
+            vis_data = gui.plots.Vis_data()
     else:
         save_in = persistence.get_current_session_path(log_dir, lecture_name)
         person_data = list()
         all_encodings = list()
-        vis_data = gui.plots.vis_data()
+        vis_data = gui.plots.Vis_data()
 
 
 

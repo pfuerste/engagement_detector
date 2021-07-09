@@ -33,8 +33,7 @@ def main():
     root.geometry("1000x1000+0+0")
     gui_running = gui.guiRunning.Application(master=root)
 
-    vis_data = gui.plots.vis_data()
-    sessions_data = gui.plots.inter_session(log_dir, lecture_name, vis_data)
+    sessions_data = gui.plots.inter_session(log_dir, lecture_name)
     gui_running.beta(sessions_data)
 
     # Start the intra-session gui properly

@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('.'))
 from io_utils.persistence import get_sorted_session_paths, load_last_session, load_all_sessions
 
 
-class vis_data():
+class Vis_data():
     """Saves data for visualization to not do calculations more often
     than needed for live plotting.
     """
@@ -121,31 +121,30 @@ class vis_data():
 
 
 # inter-session plotting
-class inter_session():
+class Inter_session():
 
-    def __init__(self, log_dir, lecture_name, vis_data):
+    def __init__(self, log_dir, lecture_name):
         self.sessions_data = load_all_sessions(log_dir, lecture_name, True)
         self.session_lengths = []
+
+    def get_avg_plots(self, window):
         self.sessions_vis_data = []
         self.avg_boredom = []
         self.avg_engagement = []
         self.avg_confusion = []
         self.avg_frustration = []
         # Can't create vis_data() here?
-        _vis_data = vis_data
+        self._vis_data = Vis_data()
         for scores in self.sessions_data[1]:
-            _vis_data.reload_old_data(scores)
-            self.sessions_vis_data.append(_vis_data)
-            self.session_lengths.append(len(_vis_data.data[0]))
+            self._vis_data.reload_old_data(scores)
+            self.sessions_vis_data.append(self._vis_data)
+            self.session_lengths.append(len(self._vis_data.data[0]))
         for vis_data in self.sessions_vis_data:
             self.avg_boredom.extend(vis_data.avg_boredom)
             self.avg_engagement.extend(vis_data.avg_engagement)
             self.avg_confusion.extend(vis_data.avg_confusion)
             self.avg_frustration.extend(vis_data.avg_frustration)
-        print("lengths: ", self.session_lengths)
 
-    # TODO Debugging
-    def get_avg_plots(self, window):
         if window.widget:
             window.widget.destroy()
 
@@ -172,8 +171,9 @@ class inter_session():
 
     def get_emotion_plot(self, emo_ind):
         fig, ax0 = plt.subplots(1, 1)
+        #for person in self.da 
 
 
 if __name__ == "__main__":
-    sess = inter_session(r"C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs", "Test")
+    sess = Inter_session(r"C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs", "Test")
     print(sess.session_paths)
