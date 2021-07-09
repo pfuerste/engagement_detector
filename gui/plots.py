@@ -129,7 +129,7 @@ class Inter_session():
         self.session_lengths = []
 
     def get_avg_plots(self, window):
-        #TODO broken axis for -1s? 
+        # TODO broken axis for -1s? 
         self.sessions_vis_data = []
         self.avg_boredom = []
         self.avg_engagement = []
@@ -141,7 +141,6 @@ class Inter_session():
             self.sessions_vis_data.append(_vis_data)
             self.session_lengths.append(len(_vis_data.data[0]))
         for vis_data in self.sessions_vis_data:
-            print(vis_data.avg_boredom)
             self.avg_boredom.extend(vis_data.avg_boredom)
             self.avg_engagement.extend(vis_data.avg_engagement)
             self.avg_confusion.extend(vis_data.avg_confusion)
@@ -171,32 +170,77 @@ class Inter_session():
         window.widget.pack(fill=BOTH)
 
     def get_emotion_plot(self, window, emo_ind):
-        num_people = 0
         checked_ids = []
+        # know how many people: counter = 0, first session: add num_ids; for other
+        # session: for encoding, check if already in, else counter++
         for i, (ids, session) in enumerate(zip(self.sessions_data[0], self.sessions_data[1])):
+            print(np.array(session).shape)
+
             self.session_lengths.append(np.array(session).shape[-1])
             if i == 0:
                 checked_ids.extend(ids)
             else:
                 for j, id in enumerate(ids):
-
                     ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.3)
-                    # print(ret)
                     ret = [1 if x else 0 for x in ret]
+                    # Person was not present in earlier lecture
                     if sum(ret) == 0:
                         checked_ids.append(id)
+                    # Person was in earlier lecture
                     elif sum(ret) == 1:
-                        print("shouldnt happen in this test")
+                        #print("shouldnt happen in this test")
                         pass
+                    # Person is similar to multiple persons in earlier lecture_names
+                    # TODO
                     else:
                         print("Oh SHIT")
-        print(len(checked_ids))
-        print(sum(self.session_lengths))
-        # TODO Create BIG array of semester length with -1s whernever someone wasnt there
-        # know how many people: counter = 0, first session: add num_ids; for other session: for encoding, check if already in, else counter++ 
+                        pass
+
+        # TODO Create BIG array of semester length with -1s whenever someone wasnt there
         # Create array -1s of shape (num_people, all_timesteps)
+        all_person_data = np.ones(shape=(len(checked_ids), sum(self.session_lengths)))*-1
         # for session: put person @ its slot
+        curr_time = 0
+        last_person = 0
+        checked_ids = []
+        for i, (ids, session) in enumerate(zip(self.sessions_data[0], self.sessions_data[1])):
+            session = np.array(session)
+            if i == 0:
+                all_person_data[:session.shape[0], :session.shape[2]] = session[:, emo_ind, :]
+                checked_ids.extend(ids)
+                last_person += session.shape[0]
+            else:
+                for j, id in enumerate(ids):
+                    ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.3)
+                    ret = [1 if x else 0 for x in ret]
+                    if sum(ret) == 0:
+                        all_person_data[last_person, curr_time:curr_time + session.shape[2]] = session[j, emo_ind, :]
+                        checked_ids.append(id)
+                        last_person += 1
+                    elif sum(ret) == 1:
+                        all_person_data[ret.index(1), curr_time:curr_time + session.shape[2]] = session[j, emo_ind, :]
+                        #print("shouldnt happen in this test")
+                        pass
+                    # TODO
+                    else:
+                        print("Oh SHIT")
+            curr_time += session.shape[2]
+            # last_person += session.shape[0]
+        print(all_person_data)
+        print(all_person_data.shape)
         fig, ax0 = plt.subplots(1, 1)
+        for person in all_person_data:
+            ax0.plot(person)
+        sess_end = 0
+        for i, time_stamp in enumerate(self.session_lengths):
+            if i == len(self.session_lengths) - 1:
+                continue
+            sess_end += time_stamp
+            ax0.axvline(x=sess_end, linestyle="dashed")
+        canvas = FigureCanvasTkAgg(fig, master=window.master)
+        window.widget = canvas.get_tk_widget()
+        window.widget.pack(fill=BOTH)
+
 
 if __name__ == "__main__":
     sess = Inter_session(r"C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs", "Test")

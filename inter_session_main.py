@@ -25,7 +25,7 @@ def main():
     # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
     # performance_mode = gui_start.PerformanceMode
     # session_duration = gui_start.Duration
-    lecture_name = "Test2"
+    lecture_name = "similar img twic, two lectures"
 
     # Call the intra-session gui
     root = Tk()
