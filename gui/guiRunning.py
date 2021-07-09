@@ -25,6 +25,7 @@ class Application(Frame):
 
     def Sende(self):
         self.ende=True
+        print("Will close after saving next iteration.")
         #self.quit()
 
     def initUI(self):
@@ -40,3 +41,7 @@ class Application(Frame):
         vis_data.get_avg_plots(window=self)
         self.update()
         # self.after(1000, self.alpha)
+
+    def beta(self, session_data):
+        session_data.get_avg_plots(window=self)
+        self.update()

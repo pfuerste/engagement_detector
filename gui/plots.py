@@ -27,11 +27,14 @@ class vis_data():
         if scores.size == 0:
             # Else reloading on empty data crashes
             return
-        print(scores.shape)
         data = np.swapaxes(scores, 0, 1)
         data = np.swapaxes(data, 1, 2)
         data = [[[p for p in emotion] for emotion in t] for t in data]
         self.data = data
+        self.avg_boredom = []
+        self.avg_engagement = []
+        self.avg_confusion = []
+        self.avg_frustration = []
         for t in range(len(data[0])):
             try:
                 self.avg_boredom.append(sum([x for x in data[0][t] if x != -1]) /
@@ -87,7 +90,6 @@ class vis_data():
 
     # intra-session plotting
     def get_avg_plots(self, window):
-        # TODO "Alarm" for slackers
         if window.widget:
             window.widget.destroy()
 
@@ -104,7 +106,7 @@ class vis_data():
             critical = self.is_critical_level()
             for i, v in enumerate(critical):
                 if v:
-                    ax0.text(x=i, y=0, s="!", color='y', fontweight='bold')
+                    ax0.text(x=i-0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
 
             ax1.set_ylim(-1, 4)
             ax1.grid()
@@ -121,26 +123,53 @@ class vis_data():
 # inter-session plotting
 class inter_session():
 
-    def __init__(self, log_dir, lecture_name):
+    def __init__(self, log_dir, lecture_name, vis_data):
         self.sessions_data = load_all_sessions(log_dir, lecture_name, True)
+        self.session_lengths = []
         self.sessions_vis_data = []
         self.avg_boredom = []
         self.avg_engagement = []
         self.avg_confusion = []
         self.avg_frustration = []
-        for ids, scores in self.sessions_data:
-            _vis_data = vis_data()
+        # Can't create vis_data() here?
+        _vis_data = vis_data
+        for scores in self.sessions_data[1]:
             _vis_data.reload_old_data(scores)
-            self.sessions.vis_data.append(_vis_data)
+            self.sessions_vis_data.append(_vis_data)
+            self.session_lengths.append(len(_vis_data.data[0]))
         for vis_data in self.sessions_vis_data:
             self.avg_boredom.extend(vis_data.avg_boredom)
             self.avg_engagement.extend(vis_data.avg_engagement)
             self.avg_confusion.extend(vis_data.avg_confusion)
             self.avg_frustration.extend(vis_data.avg_frustration)
+        print("lengths: ", self.session_lengths)
 
-    def get_avg_plots():
-        # TODO
-        pass
+    # TODO Debugging
+    def get_avg_plots(self, window):
+        if window.widget:
+            window.widget.destroy()
+
+        # break if used without data
+        if not self.avg_boredom:
+            fig, ax1 = plt.subplots(1, 1)
+        else:
+            fig, ax1 = plt.subplots(1, 1)
+            ax1.set_ylim(-1, 4)
+            ax1.grid()
+            ax1.plot(self.avg_boredom, c="black")
+            ax1.plot(self.avg_engagement, c="green")
+            ax1.plot(self.avg_confusion, c="purple")
+            ax1.plot(self.avg_frustration, c="red")
+            for time_stamp in self.session_lengths:
+                ax1.axvline(time_stamp, linestyle="dashed")
+            # TODO mark different sessions?
+        canvas = FigureCanvasTkAgg(fig, master=window.master)
+        window.widget = canvas.get_tk_widget()
+        window.widget.pack(fill=BOTH)
+
+    def get_emotion_plot(self, emo_ind):
+        fig, ax0 = plt.subplots(1, 1)
+
 
 
 if __name__ == "__main__":

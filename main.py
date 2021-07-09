@@ -105,7 +105,8 @@ def main():
         model = get_func_model()
         model.load_weights(model_path)
         model._make_predict_function()
-        while not gui_running.getEnde():
+        for i in range(5):
+        # while not gui_running.getEnde():
             iter_start = time.perf_counter()
             imgs = input_via()
             print("image taken")
@@ -156,7 +157,6 @@ def main():
                 person_data, all_encodings = manage_encodings(
                     person_data, person_preds, all_encodings, curr_encodings, longest_t)
 
-            # TODO update gui with plots
             gui_running.alpha(vis_data)
             # print(vis_data.data)
 
@@ -197,15 +197,14 @@ def main():
     # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
     # performance_mode = gui_start.PerformanceMode
     # session_duration = gui_start.Duration
-    lecture_name = "Test2"
+    lecture_name = "Test"
     input_via = io_utils.screen_grab.screenshot
     performance_mode = False
-    session_duration = 90
+    session_duration = 0.5
 
     # If the last session was less than session_duration ago, use that sessions data (probably crash/pause)
     time_diff = persistence.last_session_difference(log_dir, lecture_name)
     extend_session = False if time_diff > session_duration else True
-    print(time_diff)
     # 2 Lists for Results, because time is more important than memory
     if extend_session:
         # ? Test for edge cases
@@ -224,18 +223,23 @@ def main():
         all_encodings = list()
         vis_data = gui.plots.vis_data()
 
-    # Save incase of ealry crash/pause
-    persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
+
 
     # Call the intra-session gui
     root = Tk()
     root.title("Engagement Detector")
-    root.geometry("450x550+0+0")
+    root.geometry("1000x1000+0+0")
     gui_running = gui.guiRunning.Application(master=root)
 
+    vis_data = gui.plots.vis_data()
+    sessions_data = gui.plots.inter_session(log_dir, lecture_name, vis_data)
+    gui_running.beta(sessions_data)
+
+    # Save incase of early crash/pause
+    persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
     # Start the thread for getting data
-    t1 = threading.Thread(target=run, args=(vis_data, person_data, all_encodings, gui_running))
-    t1.start()
+    # t1 = threading.Thread(target=run, args=(vis_data, person_data, all_encodings, gui_running))
+    # t1.start()
 
     # Start the intra-session gui properly
     gui_running.mainloop()
@@ -243,6 +247,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # time.sleep(60)
+    # main()
+    # time.sleep(60)
+    # main()
     # start = time.perf_counter()
     # probs = model.predict(imgs)
     # end = time.perf_counter()
