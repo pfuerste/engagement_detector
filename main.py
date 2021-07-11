@@ -28,7 +28,7 @@ def fill_up_inference_data(inferences, t, index=None):
         index (int, optional): Only fills person at index if true. Defaults to None.
 
     Returns:
-        [type]: [description]
+        list: person_data
     """
     for i, single_data in enumerate(inferences):
         if index and i != index:
@@ -77,7 +77,6 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
         ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.3)
         ret = [1 if x else 0 for x in ret]
         rets[sum(ret)] += 1
-        # print(rets)
         # Same faces found in earlier iteration: Append to corresponding data after filling gaps there
         if sum(ret) == 1:
             person_index = ret.index(1)
@@ -87,6 +86,9 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
             person_index = len(all_encodings) - 1
             diff = t
             person_data.append([[], [], [], []])
+        # TODO multiple similar people
+        else:
+            print("oh SHIT")
         for i in range(4):
             # Saving like this (4 lists of len t per person) is bad memory access,
             # but better for later evaluation

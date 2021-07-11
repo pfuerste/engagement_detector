@@ -129,7 +129,6 @@ class Inter_session():
         self.session_lengths = []
 
     def get_avg_plots(self, window):
-        # TODO broken axis for -1s? 
         self.sessions_vis_data = []
         self.avg_boredom = []
         self.avg_engagement = []
@@ -174,8 +173,6 @@ class Inter_session():
         # know how many people: counter = 0, first session: add num_ids; for other
         # session: for encoding, check if already in, else counter++
         for i, (ids, session) in enumerate(zip(self.sessions_data[0], self.sessions_data[1])):
-            print(np.array(session).shape)
-
             self.session_lengths.append(np.array(session).shape[-1])
             if i == 0:
                 checked_ids.extend(ids)
@@ -188,7 +185,7 @@ class Inter_session():
                         checked_ids.append(id)
                     # Person was in earlier lecture
                     elif sum(ret) == 1:
-                        #print("shouldnt happen in this test")
+                        # print("shouldnt happen in this test")
                         pass
                     # Person is similar to multiple persons in earlier lecture_names
                     # TODO
@@ -196,7 +193,6 @@ class Inter_session():
                         print("Oh SHIT")
                         pass
 
-        # TODO Create BIG array of semester length with -1s whenever someone wasnt there
         # Create array -1s of shape (num_people, all_timesteps)
         all_person_data = np.ones(shape=(len(checked_ids), sum(self.session_lengths)))*-1
         # for session: put person @ its slot
@@ -219,18 +215,20 @@ class Inter_session():
                         last_person += 1
                     elif sum(ret) == 1:
                         all_person_data[ret.index(1), curr_time:curr_time + session.shape[2]] = session[j, emo_ind, :]
-                        #print("shouldnt happen in this test")
                         pass
                     # TODO
                     else:
                         print("Oh SHIT")
             curr_time += session.shape[2]
-            # last_person += session.shape[0]
-        print(all_person_data)
-        print(all_person_data.shape)
         fig, ax0 = plt.subplots(1, 1)
-        for person in all_person_data:
-            ax0.plot(person)
+        for i, person in enumerate(all_person_data):
+            col = np.random.uniform(0.0, 1.0, 3)
+            # make dashed line for timepoints where people where not present
+            discontinued = [(i, x) for i, x in enumerate(person) if x != -1]
+            discontinued_i, discontinued_x = [list(x) for x in zip(*discontinued)]
+            none_filled = [x if x != -1 else None for x in person]
+            ax0.plot(discontinued_i, discontinued_x, color=col, linestyle=":")
+            ax0.plot(none_filled, color=col)
         sess_end = 0
         for i, time_stamp in enumerate(self.session_lengths):
             if i == len(self.session_lengths) - 1:
