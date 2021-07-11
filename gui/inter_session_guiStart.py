@@ -63,27 +63,33 @@ class inter_session_guiStart:
             self.EmotionDropdown.config(state='disabled')
 
     def start(self):
-        self.LectureName=self.LectureNameDropdown.get()
-        if self.checkboxAverageData.get()==1:
-            self.averagedata=True
-            self.root.destroy()
-        elif self.checkboxSingleData.get()==1:
-            self.singledata=True
-            if self.EmotionDropdown.get()=="Boredom":
-                self.emotion=0
+        if self.LectureNameDropdown.get() in self.list:
+            self.LectureName=self.LectureNameDropdown.get()
+            if self.checkboxAverageData.get()==1:
+                self.averagedata=True
                 self.root.destroy()
-            elif self.EmotionDropdown.get()=="Engagement":
-                self.emotion=1
-                self.root.destroy()
-            elif self.EmotionDropdown.get()=="Confusion":
-                self.emotion=2
-                self.root.destroy()
-            elif self.EmotionDropdown.get()=="Frustration":
-                self.emotion=3
-                self.root.destroy()
-            else:
-                self.Error.config(text="Choose a Valid Emotion")
-                self.Error.place(relx=0.6,rely=0.85)
+            elif self.checkboxSingleData.get()==1:
+                self.singledata=True
+                if self.EmotionDropdown.get()=="Boredom":
+                    self.emotion=0
+                    self.root.destroy()
+                elif self.EmotionDropdown.get()=="Engagement":
+                    self.emotion=1
+                    self.root.destroy()
+                elif self.EmotionDropdown.get()=="Confusion":
+                    self.emotion=2
+                    self.root.destroy()
+                elif self.EmotionDropdown.get()=="Frustration":
+                    self.emotion=3
+                    self.root.destroy()
+                else:
+                    self.Error.config(text="Choose a Valid Emotion")
+                    self.Error.place(relx=0.6,rely=0.85)
+        else:
+            self.Error.config(text="Choose a valid LectureName")
+            self.Error.place(relx=0.6,rely=0.85)
+                   
+
 
 
 def main():
