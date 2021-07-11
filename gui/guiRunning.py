@@ -31,11 +31,16 @@ class Application(Frame):
     def initUI(self):
         self.pack(fill=BOTH, expand=1)
 
-        #plotbutton = Button(self, text="Plot Data", command=self.theta)
-        #plotbutton.place(relx=0.2, rely=0.9)
+        #plotbutton = Button(self, text="Plot Data", command=self.WindowWarning)
+        #plotbutton.pack(side=TOP)
 
         quitbutton = Button(self, text="Quit", command=self.Sende, height=2,width=40)
         quitbutton.pack(side=TOP)
+
+    def WindowWarning(self):
+        warning = Label(self, text="WindowWarning",bg="red")
+        warning.pack(side=TOP)
+        self.after(10000, warning.pack_forget)
 
     def alpha(self, vis_data):
         vis_data.get_avg_plots(window=self)
