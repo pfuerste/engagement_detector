@@ -34,9 +34,10 @@ def background_screenshot(hwnd, width, height):
     return np.array(im)
 
 def is_out_of_screen(x0,x1,y0,y1):
+    #i got a mistake on fullscreen sometimes(screen starts at -8 and not at 0)
     width=GetSystemMetrics(0)
     height=GetSystemMetrics(1)
-    if (x0<width and x0>0) and (x1<width and x1>0) and (y0<width and y0>0) and (y1<height and y1>0):
+    if (x0<=width and x0>=0) and (x1<=width and x1>=0) and (y0<=width and y0>=0) and (y1<=height and y1>=0):
         return True
     return False
 
