@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 from tkinter import *
+import tkinter as tk
 import sys
 import os
 sys.path.insert(0, os.path.abspath('..'))
@@ -93,7 +94,6 @@ class Vis_data():
     def get_avg_plots(self, window):
         if window.widget:
             window.widget.destroy()
-
         # break if used without data
         if not self.avg_boredom:
             fig, (ax0, ax1) = plt.subplots(2, 1)
@@ -119,6 +119,7 @@ class Vis_data():
             canvas = FigureCanvasTkAgg(fig, master=window.master)
             window.widget = canvas.get_tk_widget()
             window.widget.pack(fill=BOTH)
+            
 
 
 # inter-session plotting
@@ -144,8 +145,8 @@ class Inter_session():
             self.avg_engagement.extend(vis_data.avg_engagement)
             self.avg_confusion.extend(vis_data.avg_confusion)
             self.avg_frustration.extend(vis_data.avg_frustration)
-        if window.widget:
-            window.widget.destroy()
+        #if window.widget:
+        #    window.widget.destroy()
 
         # break if used without data
         if not self.avg_boredom:
@@ -165,8 +166,12 @@ class Inter_session():
                 sess_end += time_stamp
                 ax1.axvline(x=sess_end, linestyle="dashed")
         canvas = FigureCanvasTkAgg(fig, master=window.master)
+        window.toolbar = NavigationToolbar2Tk(canvas,window)
+        window.toolbar.update()
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
+        window.toolbars = canvas._tkcanvas
+        window.toolbars.pack(fill=BOTH)
 
     def get_emotion_plot(self, window, emo_ind):
         checked_ids = []
