@@ -183,7 +183,7 @@ class Inter_session():
                     # Person was not present in earlier lecture
                     if sum(ret) == 0:
                         checked_ids.append(id)
-                    # Person was in earlier lecture
+                    # Person was in earlier lecture, dont increment
                     elif sum(ret) == 1:
                         # print("shouldnt happen in this test")
                         pass
