@@ -10,14 +10,15 @@ class guiStart:
     def __init__(self, lecture_names):
         self.root = Tk()
         self.root.title("Engagement Detector")
-        self.root.geometry("340x340")
+        self.root.geometry("360x340")
         self.LectureName = ""
         #self.RoomName = ""
         #self.BrowserName = ""
         self.InputMethod = ""
         self.WindowName = ""
         self.Duration = 90
-        self.WindowList = [name for name in pygetwindow.getAllTitles() if name is not ""]
+        self.WindowList = [
+            name for name in pygetwindow.getAllTitles() if name is not ""]
         self.PerformanceMode = False
         self.LectureNameLabel = Label(self.root, text="Lecture Name: ")
         self.LectureNameLabel.place(x=20, y=20)
@@ -42,7 +43,8 @@ class guiStart:
         self.WindowGrabTick.place(x=60, y=140)
         self.WindowNameLabel = Label(self.root, text="Choose Window ")
         self.WindowNameLabel.place(x=60, y=180)
-        self.WindowNameDropdown = ttk.Combobox(self.root, values=self.WindowList, state='disabled')
+        self.WindowNameDropdown = ttk.Combobox(
+            self.root, values=self.WindowList, state='disabled')
         self.WindowNameDropdown.place(x=160, y=180)
         #self.BrowserLabel = Label(self.root, text="Browser")
         #self.BrowserLabel.place(x=60, y=180)
@@ -81,29 +83,37 @@ class guiStart:
         self.root.mainloop()
 
     def start(self):
-        print(self.WindowList)
-        self.LectureName = self.LectureNameDropDown.get()
-        if (self.DurationEntry.get().isdigit() and int(self.DurationEntry.get()) > 0):
-            self.Duration = int(self.DurationEntry.get())
-            if self.checkboxPerformance.get() == 1:
-                self.PerformanceMode = True
-            if self.checkboxWindowgrab.get() == 1:
-                self.InputMethod = "WindowGrab"
-                if self.WindowNameDropdown.get() in self.WindowList:
-                    self.WindowName = self.WindowNameDropdown.get()
-                    self.root.destroy()
+        if (self.LectureNameDropDown.get() != ""):
+            if(not any(not (c.isalnum()or c==" ") for c in self.LectureNameDropDown.get())):
+                self.LectureName = self.LectureNameDropDown.get()
+                if (self.DurationEntry.get().isdigit()
+                        and int(self.DurationEntry.get()) > 0):
+                    self.Duration = int(self.DurationEntry.get())
+                    if self.checkboxPerformance.get() == 1:
+                        self.PerformanceMode = True
+                    if self.checkboxWindowgrab.get() == 1:
+                        self.InputMethod = "WindowGrab"
+                        if self.WindowNameDropdown.get() in self.WindowList:
+                            self.WindowName = self.WindowNameDropdown.get()
+                            self.root.destroy()
+                        else:
+                            self.Error.config(text="Choose a valid Window")
+                            self.Error.place(x=160, y=260)
+                        #self.RoomName = self.RoomNameEntry.get()
+                        #self.BrowserName = self.BrowserDropDown.get()
+                    elif self.checkboxScreenshot.get() == 1:
+                        self.InputMethod = "ScreenShot"
+                    # Aufruf der jeweiligen neuen Klasse fehlt
+                    # Loeschen des alten Fensters
+                        self.root.destroy()
                 else:
-                    self.Error.config(text="Choose a valid Window")
+                    self.Error.config(text="Choose a valid Duration")
                     self.Error.place(x=160, y=260)
-                #self.RoomName = self.RoomNameEntry.get()
-                #self.BrowserName = self.BrowserDropDown.get()
-            elif self.checkboxScreenshot.get() == 1:
-                self.InputMethod = "ScreenShot"
-            # Aufruf der jeweiligen neuen Klasse fehlt
-            # Loeschen des alten Fensters
-                self.root.destroy()
+            else:
+                self.Error.config(text="Only Isanum&Space as Lecture")
+                self.Error.place(x=160, y=260)
         else:
-            self.Error.config(text="Choose a valid Duration")
+            self.Error.config(text="Enter a Lecture")
             self.Error.place(x=160, y=260)
 
     def ableWindowgrab(self):
