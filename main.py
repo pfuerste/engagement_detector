@@ -17,6 +17,7 @@ import gui.guiRunning
 import gui.guiStart
 import threading
 from tkinter import *
+import ctypes
 
 
 def fill_up_inference_data(inferences, t, index=None):
@@ -106,7 +107,7 @@ def main():
         model.load_weights(model_path)
         model._make_predict_function()
         for i in range(5):
-        # while not gui_running.getEnde():
+            # while not gui_running.getEnde():
             iter_start = time.perf_counter()
             imgs = input_via()
             print("image taken")
@@ -180,6 +181,10 @@ def main():
         time.sleep(5)
         os._exit(1)
 
+    # TODO setze in run für thread process?
+    awareness = ctypes.c_int()
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+
     # read config (developer info)
     root = yaml.safe_load(open("config.yml"))["root"]
     model_path = yaml.safe_load(open("config.yml"))["model"]
@@ -223,13 +228,11 @@ def main():
         all_encodings = list()
         vis_data = gui.plots.Vis_data()
 
-
     # Call the intra-session gui
     root = Tk()
     root.title("Engagement Detector")
     root.geometry("450x350+0+0")
     gui_running = gui.guiRunning.Application(master=root)
-
 
     # Save incase of early crash/pause
     persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
@@ -243,8 +246,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-    #time.sleep(60)
-    #main()
+    # time.sleep(60)
+    # main()
     # time.sleep(60)
     # main()
     # start = time.perf_counter()
