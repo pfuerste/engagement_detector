@@ -38,6 +38,7 @@ def background_screenshot(hwnd, width, height):
     cDC.DeleteDC()
     win32gui.ReleaseDC(hwnd, wDC)
     win32gui.DeleteObject(dataBitMap.GetHandle())
+    im.show()
     return [np.array(im)]
 
 
