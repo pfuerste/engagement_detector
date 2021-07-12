@@ -188,13 +188,11 @@ class Inter_session():
                         # print("shouldnt happen in this test")
                         pass
                     # Person is similar to multiple persons in earlier lecture_names
-                    # TODO
                     else:
-                        print("Oh SHIT")
-                        pass
+                        raise Exception("Somehow people ended up as multiples in saved data. Contact Support.")
 
         # Create array -1s of shape (num_people, all_timesteps)
-        all_person_data = np.ones(shape=(len(checked_ids), sum(self.session_lengths)))*-1
+        all_person_data = np.ones(shape=(len(checked_ids), sum(self.session_lengths))) * -1
         # for session: put person @ its slot
         curr_time = 0
         last_person = 0
