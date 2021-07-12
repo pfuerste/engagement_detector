@@ -83,9 +83,9 @@ class guiStart:
         self.root.mainloop()
 
     def start(self):
-        if (self.LectureNameDropDown.get() != ""):
+        if (self.LectureNameDropDown.get().strip() != ""):
             if(not any(not (c.isalnum()or c==" ") for c in self.LectureNameDropDown.get())):
-                self.LectureName = self.LectureNameDropDown.get()
+                self.LectureName = self.LectureNameDropDown.get().strip()
                 if (self.DurationEntry.get().isdigit()
                         and int(self.DurationEntry.get()) > 0):
                     self.Duration = int(self.DurationEntry.get())
