@@ -15,9 +15,9 @@ class guiStart:
         #self.RoomName = ""
         #self.BrowserName = ""
         self.InputMethod = ""
-        self.WindowName= ""
+        self.WindowName = ""
         self.Duration = 90
-        self.WindowList= pygetwindow.getAllTitles()
+        self.WindowList = [name for name in pygetwindow.getAllTitles() if name is not ""]
         self.PerformanceMode = False
         self.LectureNameLabel = Label(self.root, text="Lecture Name: ")
         self.LectureNameLabel.place(x=20, y=20)
@@ -41,12 +41,12 @@ class guiStart:
             command=self.ableWindowgrab)
         self.WindowGrabTick.place(x=60, y=140)
         self.WindowNameLabel = Label(self.root, text="Choose Window ")
-        self.WindowNameLabel.place(x=60,y=180)
-        self.WindowNameDropdown = ttk.Combobox(self.root, values=self.WindowList,state='disabled')
+        self.WindowNameLabel.place(x=60, y=180)
+        self.WindowNameDropdown = ttk.Combobox(self.root, values=self.WindowList, state='disabled')
         self.WindowNameDropdown.place(x=160, y=180)
         #self.BrowserLabel = Label(self.root, text="Browser")
         #self.BrowserLabel.place(x=60, y=180)
-        #self.BrowserDropDown = ttk.Combobox(
+        # self.BrowserDropDown = ttk.Combobox(
         #    self.root,
         #    values=[
         #        "Google Chrome",
@@ -77,12 +77,13 @@ class guiStart:
             command=self.start,
             state='disabled')
         self.StartButton.place(x=270, y=300)
-        self.Error = Label(self.root,text="",bg="red")
+        self.Error = Label(self.root, text="", bg="red")
         self.root.mainloop()
 
     def start(self):
+        print(self.WindowList)
         self.LectureName = self.LectureNameDropDown.get()
-        if (self.DurationEntry.get().isdigit() and int(self.DurationEntry.get())>0):
+        if (self.DurationEntry.get().isdigit() and int(self.DurationEntry.get()) > 0):
             self.Duration = int(self.DurationEntry.get())
             if self.checkboxPerformance.get() == 1:
                 self.PerformanceMode = True
@@ -93,7 +94,7 @@ class guiStart:
                     self.root.destroy()
                 else:
                     self.Error.config(text="Choose a valid Window")
-                    self.Error.place(x=160,y=260)
+                    self.Error.place(x=160, y=260)
                 #self.RoomName = self.RoomNameEntry.get()
                 #self.BrowserName = self.BrowserDropDown.get()
             elif self.checkboxScreenshot.get() == 1:
@@ -103,20 +104,19 @@ class guiStart:
                 self.root.destroy()
         else:
             self.Error.config(text="Choose a valid Duration")
-            self.Error.place(x=160,y=260)
-            
+            self.Error.place(x=160, y=260)
 
     def ableWindowgrab(self):
         if self.checkboxWindowgrab.get() == 1:
-            #self.BrowserDropDown.config(state='enabled')
-            #self.RoomNameEntry.config(state='normal')
+            # self.BrowserDropDown.config(state='enabled')
+            # self.RoomNameEntry.config(state='normal')
             self.WindowNameDropdown.config(state='enabled')
             self.ScreenshotTick.config(state='disabled')
             self.StartButton.config(state='normal')
 
         elif self.checkboxWindowgrab.get() == 0:
-            #self.BrowserDropDown.config(state='disabled')
-            #self.RoomNameEntry.config(state='disabled')
+            # self.BrowserDropDown.config(state='disabled')
+            # self.RoomNameEntry.config(state='disabled')
             self.WindowNameDropdown.config(state='disabled')
             self.ScreenshotTick.config(state='normal')
             self.StartButton.config(state='disabled')
