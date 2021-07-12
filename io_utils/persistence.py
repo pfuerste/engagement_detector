@@ -184,6 +184,8 @@ def get_old_lecture_names(sessions_root):
     Returns:
         list: all lecture names
     """
+    if not os.path.isdir(sessions_root):
+        os.makedirs(sessions_root)
     return os.listdir(sessions_root)
 
 
