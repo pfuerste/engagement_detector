@@ -49,7 +49,6 @@ def hough_lines_cutter(img):
 
     minLineLength = 100
     maxLineGap = 10
-    # TODO: find better params for lineextractor
     lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100,
                             lines=np.array([]), minLineLength=minLineLength, maxLineGap=80)
 
