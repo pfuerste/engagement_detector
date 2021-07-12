@@ -207,9 +207,6 @@ def main():
 
         person_data = fill_up_inference_data(person_data, longest_t + 1)
         persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
-        # print(f"Len Endings save: {len(all_encodings)}")
-        # print(f"data save: {person_data}")
-        # print("Ich komme bis hier")
         time.sleep(5)
         os._exit(1)
 
@@ -279,11 +276,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # time.sleep(60)
-    # main()
-    # time.sleep(60)
-    # main()
-    # start = time.perf_counter()
-    # probs = model.predict(imgs)
-    # end = time.perf_counter()
-    # print(f"3 images took {end-start} time(s).")

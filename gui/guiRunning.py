@@ -1,6 +1,4 @@
 from tkinter import *
-import sys
-# from .plots import get_avg_plots
 
 
 class Application(Frame):

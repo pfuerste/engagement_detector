@@ -15,9 +15,7 @@ from tkinter import *
 def main():
     # read config (developer info)
     root = yaml.safe_load(open("config.yml"))["root"]
-    model_path = yaml.safe_load(open("config.yml"))["model"]
     log_dir = yaml.safe_load(open("config.yml"))["logs"]
-    interval = int(yaml.safe_load(open("config.yml"))["inference_interval"])
 
     # read from gui:
     gui_start = gui.inter_session_guiStart.inter_session_guiStart(persistence.get_old_lecture_names(log_dir))
@@ -40,11 +38,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # time.sleep(60)
-    # main()
-    # time.sleep(60)
-    # main()
-    # start = time.perf_counter()
-    # probs = model.predict(imgs)
-    # end = time.perf_counter()
-    # print(f"3 images took {end-start} time(s).")

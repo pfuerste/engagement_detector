@@ -4,11 +4,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 from tkinter import *
 import tkinter as tk
-import sys
-import os
-sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('.'))
-from io_utils.persistence import get_sorted_session_paths, load_last_session, load_all_sessions
+from io_utils.persistence import load_all_sessions
 import face_recognition
 
 
@@ -119,7 +115,6 @@ class Vis_data():
             canvas = FigureCanvasTkAgg(fig, master=window.master)
             window.widget = canvas.get_tk_widget()
             window.widget.pack(fill=BOTH)
-            
 
 
 # inter-session plotting
@@ -145,7 +140,7 @@ class Inter_session():
             self.avg_engagement.extend(vis_data.avg_engagement)
             self.avg_confusion.extend(vis_data.avg_confusion)
             self.avg_frustration.extend(vis_data.avg_frustration)
-        #if window.widget:
+        # if window.widget:
         #    window.widget.destroy()
 
         # break if used without data
@@ -166,7 +161,7 @@ class Inter_session():
                 sess_end += time_stamp
                 ax1.axvline(x=sess_end, linestyle="dashed")
         canvas = FigureCanvasTkAgg(fig, master=window.master)
-        window.toolbar = NavigationToolbar2Tk(canvas,window)
+        window.toolbar = NavigationToolbar2Tk(canvas, window)
         window.toolbar.update()
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
@@ -240,8 +235,3 @@ class Inter_session():
         canvas = FigureCanvasTkAgg(fig, master=window.master)
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
-
-
-if __name__ == "__main__":
-    sess = Inter_session(r"C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs", "Test")
-    print(sess.session_paths)
