@@ -1,7 +1,6 @@
 import os
 import time
 import numpy as np
-from face_recognition.api import face_encodings, compare_faces
 import yaml
 import face_recognition
 from io_utils import encodings_identity as ei
@@ -137,6 +136,9 @@ def main():
         while not gui_running.getEnde():
             iter_start = time.perf_counter()
             if window:
+                if io_utils.screen_grab.window_out_of_screen(window):
+                    gui_running.WindowWarning("Please maximize the lecture input window in the background.")
+                time.sleep(5)
                 imgs = input_via(window)
             else:
                 imgs = input_via()

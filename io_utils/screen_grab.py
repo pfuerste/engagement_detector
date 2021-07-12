@@ -38,15 +38,20 @@ def background_screenshot(hwnd, width, height):
     cDC.DeleteDC()
     win32gui.ReleaseDC(hwnd, wDC)
     win32gui.DeleteObject(dataBitMap.GetHandle())
-    im.show()
     return [np.array(im)]
 
 
-def is_out_of_screen(x0, x1, y0, y1):
+def window_out_of_screen(name):
+    hwnd = win32gui.FindWindow(None, name)
+    x0, y0, x1, y1 = win32gui.GetWindowRect(hwnd)
+    return coords_out_of_screen(x0, y0, x1, y1)
+
+
+def coords_out_of_screen(x0, y0, x1, y1):
     width = GetSystemMetrics(0)
     height = GetSystemMetrics(1)
-    if not (-20 <= x0 <= width) or not (-20 <= x1 <= width) or \
-       not (-20 <= y0 <= height) or not (-20 <= y1 <= height):
+    if not (-20 <= x0 <= width + 20) or not (-20 <= x1 <= width + 20) or \
+       not (-20 <= y0 <= height + 20) or not (-20 <= y1 <= height + 20):
         return True
     return False
 
@@ -54,7 +59,7 @@ def is_out_of_screen(x0, x1, y0, y1):
 if __name__ == "__main__":
     hwnd = win32gui.FindWindow(None, "Telegram")
     x0, y0, x1, y1 = win32gui.GetWindowRect(hwnd)
-    if is_out_of_screen(x0, y0, x1, y1) is False:
+    if coords_out_of_screen(x0, y0, x1, y1) is False:
         # gui_running.WindowWarning()
         print(x0, y0, x1, y1)
     background_screenshot(hwnd, x1 - x0, y1 - y0)

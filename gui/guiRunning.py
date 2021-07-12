@@ -24,8 +24,8 @@ class Application(Frame):
         quitbutton = Button(self, text="Quit", command=self.Sende, height=2, width=40)
         quitbutton.pack(side=TOP)
 
-    def WindowWarning(self):
-        warning = Label(self, text="WindowWarning", bg="red")
+    def WindowWarning(self, text):
+        warning = Label(self, text=text, bg="red")
         warning.pack(side=TOP)
         self.after(10000, warning.pack_forget)
 
