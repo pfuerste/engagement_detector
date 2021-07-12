@@ -187,8 +187,11 @@ def main():
             if not performance_mode:
                 person_data, all_encodings = manage_encodings(
                     person_data, person_preds, all_encodings, curr_encodings, longest_t)
-
-            gui_running.alpha(vis_data)
+            try:
+                gui_running.intra_avg_plot(vis_data)
+            # GUI already closed
+            except RuntimeError:
+                pass
 
             t += 1
             iter_end = time.perf_counter()
@@ -228,7 +231,7 @@ def main():
     if gui_start.InputMethod.lower() == "windowgrab":
         window = gui_start.WindowName
     else:
-        print(gui_start.InputMethod.lower())
+        window = None
     performance_mode = gui_start.PerformanceMode
     session_duration = gui_start.Duration
 
@@ -261,7 +264,7 @@ def main():
     # Call the intra-session gui
     root = Tk()
     root.title("Engagement Detector")
-    root.geometry("450x350+0+0")
+    root.geometry("1000x800+0+0")
     gui_running = gui.guiRunning.Application(master=root)
 
     # Save incase of early crash/pause

@@ -21,18 +21,18 @@ def main():
 
     # read from gui:
     gui_start = gui.inter_session_guiStart.inter_session_guiStart(persistence.get_old_lecture_names(log_dir))
-    
+
     # Call the intra-session gui
     root = Tk()
     root.title("Engagement Detector")
-    root.geometry("600x500+0+0")
+    root.geometry("1000x800+0+0")
     gui_running = gui.guiRunning.Application(master=root)
 
     sessions_data = gui.plots.Inter_session(log_dir, gui_start.LectureName)
-    if gui_start.averagedata==True:
-        gui_running.beta(sessions_data)
-    elif gui_start.singledata==True:
-        gui_running.theta(sessions_data, gui_start.emotion)
+    if gui_start.averagedata is True:
+        gui_running.inter_avg_plot(sessions_data)
+    elif gui_start.singledata is True:
+        gui_running.inter_emo_plot(sessions_data, gui_start.emotion)
 
     # Start the intra-session gui properly
     gui_running.mainloop()

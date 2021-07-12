@@ -12,8 +12,6 @@ class guiStart:
         self.root.title("Engagement Detector")
         self.root.geometry("360x340")
         self.LectureName = ""
-        #self.RoomName = ""
-        #self.BrowserName = ""
         self.InputMethod = ""
         self.WindowName = ""
         self.Duration = 90
@@ -22,8 +20,6 @@ class guiStart:
         self.PerformanceMode = False
         self.LectureNameLabel = Label(self.root, text="Lecture Name: ")
         self.LectureNameLabel.place(x=20, y=20)
-        #self.LectureNameEntry = Entry(self.root)
-        #self.LectureNameEntry.place(x=160, y=20)
         self.list = lecture_names
         self.LectureNameDropDown = ttk.Combobox(self.root, values=self.list)
         self.LectureNameDropDown.place(x=160, y=20)
@@ -46,20 +42,6 @@ class guiStart:
         self.WindowNameDropdown = ttk.Combobox(
             self.root, values=self.WindowList, state='disabled')
         self.WindowNameDropdown.place(x=160, y=180)
-        #self.BrowserLabel = Label(self.root, text="Browser")
-        #self.BrowserLabel.place(x=60, y=180)
-        # self.BrowserDropDown = ttk.Combobox(
-        #    self.root,
-        #    values=[
-        #        "Google Chrome",
-        #        "Microsoft Edge",
-        #        "Mozilla Firefox"],
-        #    state='disabled')
-        #self.BrowserDropDown.place(x=160, y=180)
-        #self.RoomNameLabel = Label(self.root, text="Room Name")
-        #self.RoomNameLabel.place(x=60, y=220)
-        #self.RoomNameEntry = Entry(self.root, state='disabled')
-        #self.RoomNameEntry.place(x=160, y=220)
         self.checkboxScreenshot = tk.IntVar()
         self.ScreenshotTick = Checkbutton(
             self.root,
@@ -84,7 +66,7 @@ class guiStart:
 
     def start(self):
         if (self.LectureNameDropDown.get().strip() != ""):
-            if(not any(not (c.isalnum()or c==" ") for c in self.LectureNameDropDown.get())):
+            if(not any(not (c.isalnum() or c == " ") for c in self.LectureNameDropDown.get())):
                 self.LectureName = self.LectureNameDropDown.get().strip()
                 if (self.DurationEntry.get().isdigit()
                         and int(self.DurationEntry.get()) > 0):
@@ -99,8 +81,6 @@ class guiStart:
                         else:
                             self.Error.config(text="Choose a valid Window")
                             self.Error.place(x=160, y=260)
-                        #self.RoomName = self.RoomNameEntry.get()
-                        #self.BrowserName = self.BrowserDropDown.get()
                     elif self.checkboxScreenshot.get() == 1:
                         self.InputMethod = "ScreenShot"
                     # Aufruf der jeweiligen neuen Klasse fehlt
@@ -118,15 +98,11 @@ class guiStart:
 
     def ableWindowgrab(self):
         if self.checkboxWindowgrab.get() == 1:
-            # self.BrowserDropDown.config(state='enabled')
-            # self.RoomNameEntry.config(state='normal')
             self.WindowNameDropdown.config(state='enabled')
             self.ScreenshotTick.config(state='disabled')
             self.StartButton.config(state='normal')
 
         elif self.checkboxWindowgrab.get() == 0:
-            # self.BrowserDropDown.config(state='disabled')
-            # self.RoomNameEntry.config(state='disabled')
             self.WindowNameDropdown.config(state='disabled')
             self.ScreenshotTick.config(state='normal')
             self.StartButton.config(state='disabled')
