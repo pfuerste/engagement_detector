@@ -69,7 +69,7 @@ class Vis_data():
         self.avg_engagement.append(new_averages[1])
         self.avg_confusion.append(new_averages[2])
         self.avg_frustration.append(new_averages[3])
-    #TODO check -1s for no people in frames
+
     def current_avgs(self):
         return self.avg_boredom[-1], self.avg_engagement[-1], \
             self.avg_confusion[-1], self.avg_frustration[-1]
@@ -216,9 +216,8 @@ class Inter_session():
                     elif sum(ret) == 1:
                         all_person_data[ret.index(1), curr_time:curr_time + session.shape[2]] = session[j, emo_ind, :]
                         pass
-                    # TODO
                     else:
-                        print("Oh SHIT")
+                        raise Exception("Somehow people ended up as multiples in saved data. Contact Support.")
             curr_time += session.shape[2]
         fig, ax0 = plt.subplots(1, 1)
         for i, person in enumerate(all_person_data):
