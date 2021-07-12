@@ -69,7 +69,7 @@ class Vis_data():
         self.avg_engagement.append(new_averages[1])
         self.avg_confusion.append(new_averages[2])
         self.avg_frustration.append(new_averages[3])
-
+    #TODO check -1s for no people in frames
     def current_avgs(self):
         return self.avg_boredom[-1], self.avg_engagement[-1], \
             self.avg_confusion[-1], self.avg_frustration[-1]

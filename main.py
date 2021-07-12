@@ -73,7 +73,6 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
     # "Usual" case: Found faces during lecture
     rets = dict(zip(range(len(all_encodings) + 1), [0] * (len(all_encodings) + 1)))
     for preds, encoding in zip(new_inferences, curr_encodings):
-        # TODO check this tolerance value, maybe implement adaptive tolerance for hard cases?
         ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.3)
         ret = [1 if x else 0 for x in ret]
         rets[sum(ret)] += 1
@@ -81,19 +80,43 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
         if sum(ret) == 1:
             person_index = ret.index(1)
             diff = t - len(person_data[person_index][0]) - 1
+            similarity_handled = True
+        # This is a new face, append new list for that person
         if sum(ret) == 0:
             all_encodings.append(encoding)
             person_index = len(all_encodings) - 1
             diff = t
             person_data.append([[], [], [], []])
-        # TODO multiple similar people
+            similarity_handled = True
+        # This person is similar to multiple people from earlier. Decrease Encoding distance iterativly.
+        # If still similar to multiples, just ignore the person for this iteration and dont append its data.
         else:
-            print("oh SHIT")
-        for i in range(4):
-            # Saving like this (4 lists of len t per person) is bad memory access,
-            # but better for later evaluation
-            person_data[person_index][i].extend([-1] * diff)
-            person_data[person_index][i].append(preds[i])
+            tol = 0.3
+            similarity_handled = False
+            for i in range(3):
+                tol *= 0.75
+                ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.3)
+                ret = [1 if x else 0 for x in ret]
+                if sum(ret) == 1:
+                    person_index = ret.index(1)
+                    diff = t - len(person_data[person_index][0]) - 1
+                    similarity_handled = True
+                    continue
+                if sum(ret) == 0:
+                    all_encodings.append(encoding)
+                    person_index = len(all_encodings) - 1
+                    diff = t
+                    person_data.append([[], [], [], []])
+                    similarity_handled = True
+                    continue
+
+        # Save data for person. Skip if person is duplicate (similar to multiples).
+        if similarity_handled:
+            for i in range(4):
+                # Saving like this (4 lists of len t per person) is bad memory access,
+                # but better for later evaluation
+                person_data[person_index][i].extend([-1] * diff)
+                person_data[person_index][i].append(preds[i])
 
     # Fill up for person data for faces which where not found in this frame.
     # All data will have the same length now.
@@ -108,7 +131,7 @@ def main():
         model.load_weights(model_path)
         model._make_predict_function()
         for i in range(5):
-        # while not gui_running.getEnde():
+            # while not gui_running.getEnde():
             iter_start = time.perf_counter()
             imgs = input_via()
             print("image taken")
@@ -199,7 +222,7 @@ def main():
     # input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
     # performance_mode = gui_start.PerformanceMode
     # session_duration = gui_start.Duration
-    lecture_name = "similar img twic, two lectures"
+    lecture_name = "test adaptive thresh"
     input_via = io_utils.screen_grab.screenshot
     performance_mode = False
     session_duration = 0.5
@@ -225,13 +248,11 @@ def main():
         all_encodings = list()
         vis_data = gui.plots.Vis_data()
 
-
     # Call the intra-session gui
     root = Tk()
     root.title("Engagement Detector")
     root.geometry("1000x1000+0+0")
     gui_running = gui.guiRunning.Application(master=root)
-
 
     # Save incase of early crash/pause
     persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
@@ -245,8 +266,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-    #time.sleep(60)
-    #main()
+    # time.sleep(60)
+    # main()
     # time.sleep(60)
     # main()
     # start = time.perf_counter()
