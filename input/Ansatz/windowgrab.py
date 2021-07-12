@@ -47,6 +47,12 @@ def windowgrab(name):
     #No Idea how to send it to GUI from here. Call it from Main?
     return background_screenshot(hwnd,x1-abs(x0),y1-y0)
 
+hwnd = win32gui.FindWindow(None, "Telegram")
+x0,y0,x1,y1=win32gui.GetWindowRect(hwnd)
+if is_out_of_screen(x0,y0,x1,y1)==False:
+    #gui_running.WindowWarning()
+    print(x0,y1,x1,y1)
+background_screenshot(hwnd, x1-x0, y1-y0)
 
 ##needs to be in main
 '''
