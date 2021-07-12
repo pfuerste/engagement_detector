@@ -1,10 +1,8 @@
 import os
 import time
 import numpy as np
-import sys
 from face_recognition.api import face_encodings, compare_faces
 import yaml
-import keras
 import face_recognition
 from io_utils import encodings_identity as ei
 from io_utils import persistence
@@ -126,15 +124,22 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
 
 
 def main():
-    def run(vis_data, person_data, all_encodings, gui_running):
+    def run(vis_data, person_data, all_encodings, gui_running, window=None):
+        # Make windowgrab DPI-aware incase of Resolution scaling
+        awareness = ctypes.c_int()
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+
         t = 0
         model = get_func_model()
         model.load_weights(model_path)
         model._make_predict_function()
-        for i in range(5):
-            # while not gui_running.getEnde():
+        # for i in range(5):
+        while not gui_running.getEnde():
             iter_start = time.perf_counter()
-            imgs = input_via()
+            if window:
+                imgs = input_via(window)
+            else:
+                imgs = input_via()
             print("image taken")
             # find faces
             face_locs = list()
@@ -184,7 +189,6 @@ def main():
                     person_data, person_preds, all_encodings, curr_encodings, longest_t)
 
             gui_running.alpha(vis_data)
-            # print(vis_data.data)
 
             t += 1
             iter_end = time.perf_counter()
@@ -206,10 +210,6 @@ def main():
         time.sleep(5)
         os._exit(1)
 
-    # TODO setze in run für thread process?
-    awareness = ctypes.c_int()
-    ctypes.windll.shcore.SetProcessDpiAwareness(2)
-
     # read config (developer info)
     root = yaml.safe_load(open("config.yml"))["root"]
     model_path = yaml.safe_load(open("config.yml"))["model"]
@@ -225,19 +225,24 @@ def main():
     gui_start = gui.guiStart.guiStart(persistence.get_old_lecture_names(log_dir))
     lecture_name = gui_start.LectureName
     input_via = getattr(io_utils.screen_grab, gui_start.InputMethod.lower())
+    if gui_start.InputMethod.lower() == "windowgrab":
+        window = gui_start.WindowName
+    else:
+        print(gui_start.InputMethod.lower())
     performance_mode = gui_start.PerformanceMode
     session_duration = gui_start.Duration
-    #lecture_name = "Test2"
-    #input_via = io_utils.screen_grab.screenshot
-    #performance_mode = False
-    #session_duration = 0.5
+
+    # Dummy Test init (no guiStart)
+    # lecture_name = "Test2"
+    # input_via = io_utils.screen_grab.screenshot
+    # performance_mode = False
+    # session_duration = 0.5
 
     # If the last session was less than session_duration ago, use that sessions data (probably crash/pause)
     time_diff = persistence.last_session_difference(log_dir, lecture_name)
     extend_session = False if time_diff > session_duration else True
     # 2 Lists for Results, because time is more important than memory
     if extend_session:
-        # ? Test for edge cases
         save_in = persistence.get_latest_session_path(log_dir, lecture_name)
         try:
             all_encodings, person_data = persistence.load_last_session(log_dir, lecture_name, as_lists=True)
@@ -262,7 +267,7 @@ def main():
     # Save incase of early crash/pause
     persistence.save_session(save_in, np.array(all_encodings), np.array(person_data))
     # Start the thread for getting data
-    t1 = threading.Thread(target=run, args=(vis_data, person_data, all_encodings, gui_running))
+    t1 = threading.Thread(target=run, args=(vis_data, person_data, all_encodings, gui_running, window))
     t1.start()
 
     # Start the intra-session gui properly
