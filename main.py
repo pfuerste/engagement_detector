@@ -217,6 +217,7 @@ def main():
     model_path = yaml.safe_load(open("config.yml"))["model"]
     log_dir = yaml.safe_load(open("config.yml"))["logs"]
     interval = int(yaml.safe_load(open("config.yml"))["inference_interval"])
+    keep_top = bool(yaml.safe_load(open("config.yml"))["keep_top"])
 
     # load model
     model = get_func_model()
@@ -264,6 +265,8 @@ def main():
     root = Tk()
     root.title("Engagement Detector")
     root.geometry("1000x800+0+0")
+    if keep_top:
+        root.wm_attributes("-topmost", 1)
     gui_running = gui.guiRunning.Application(master=root)
 
     # Save incase of early crash/pause
