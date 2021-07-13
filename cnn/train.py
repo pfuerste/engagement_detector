@@ -24,7 +24,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
 def train(old_model=None):
     sys.path.insert(0, os.path.abspath('..'))
     sys.path.insert(0, os.path.abspath('.'))
-    from models import get_model, get_func_model
+    from models import get_model, get_func_model_mse
     import data.DAiSEE as dai
 
     print(tf.config.list_physical_devices())
@@ -41,26 +41,26 @@ def train(old_model=None):
     if old_model:
         model = keras.models.load_model(old_model)
     else:
-        model = get_func_model()
+        model = get_func_model_mse()
 
-    train_df = dai.get_dataframe("Test")
+    train_df = dai.get_dataframe("Train")
     val_df = dai.get_dataframe("Validation")
-    train_datagen = dai.get_flowing_datagen(dai.get_datagen(), train_df, "Test", (64, 64))
+    train_datagen = dai.get_flowing_datagen(dai.get_datagen(), train_df, "Train", (64, 64))
     val_datagen = dai.get_flowing_datagen(dai.get_datagen(), val_df, "Validation", (64, 64))
     train_datagen = dai.reshaped_gen(train_datagen)
     val_datagen = dai.reshaped_gen(val_datagen)
     print("Got Dataframes.")
 
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath=os.path.join(model_dir, "checkpoints.hdf5"),
+        filepath=os.path.join(model_dir, "checkpoints_mse.hdf5"),
         save_weights_only=True,
         monitor='val_Engagement_accuracy',
         mode='auto',
         save_best_only=True)
     tb_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0,
                                               write_graph=True, write_images=False)
-    callbacks = [model_checkpoint_callback,
-                 tb_callback]
+    callbacks = [model_checkpoint_callback]
+                 #,tb_callback]
 
     # Distribution over all train data computed by data/analysis.py
     bs = [111681, 82821, 41076, 6412]
@@ -82,7 +82,7 @@ def train(old_model=None):
                         callbacks=callbacks,
                         class_weight=class_weights,
                         use_multiprocessing=True)
-    model.save(os.path.join(model_dir, "final_model.h5"))
+    model.save(os.path.join(model_dir, "final_model_mse.h5"))
 
 
 if __name__ == "__main__":
