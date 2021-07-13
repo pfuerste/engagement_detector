@@ -43,10 +43,10 @@ def train(old_model=None):
     else:
         model = get_func_model()
 
-    train_df = dai.get_dataframe("Train")
+    train_df = dai.get_dataframe("Test")
     val_df = dai.get_dataframe("Validation")
-    train_datagen = dai.get_flowing_datagen(dai.get_datagen(), train_df, "Train", (32, 32))
-    val_datagen = dai.get_flowing_datagen(dai.get_datagen(), val_df, "Validation", (32, 32))
+    train_datagen = dai.get_flowing_datagen(dai.get_datagen(), train_df, "Test", (64, 64))
+    val_datagen = dai.get_flowing_datagen(dai.get_datagen(), val_df, "Validation", (64, 64))
     train_datagen = dai.reshaped_gen(train_datagen)
     val_datagen = dai.reshaped_gen(val_datagen)
     print("Got Dataframes.")
