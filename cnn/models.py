@@ -269,18 +269,186 @@ def get_func_model(input_shape=(64, 64, 3)):
     optimizer = optimizers.Adam()
     model = Model(inputs=inp, outputs=[b5, e5, c5, f5])
 
-    # ! Falscher Loss?
-    # model.compile(optimizer=optimizer,
-    #               loss={"Boredom": 'sparse_categorical_crossentropy',
-    #                     "Engagement": 'sparse_categorical_crossentropy',
-    #                     "Confusion": 'sparse_categorical_crossentropy',
-    #                     "Frustration": 'sparse_categorical_crossentropy'},
-    #               metrics=['sparse_categorical_crossentropy', 'accuracy'])
     model.compile(optimizer=optimizer,
-                  loss={"Boredom": 'mse',
-                        "Engagement": 'mse',
-                        "Confusion": 'mse',
-                        "Frustration": 'mse'},
+                  loss={"Boredom": 'sparse_categorical_crossentropy',
+                        "Engagement": 'sparse_categorical_crossentropy',
+                        "Confusion": 'sparse_categorical_crossentropy',
+                        "Frustration": 'sparse_categorical_crossentropy'},
+                  metrics=['sparse_categorical_crossentropy', 'accuracy'])
+
+    print(model.summary())
+    return model
+
+
+def get_func_model_mse(input_shape=(64, 64, 3)):
+    """Returns a compiled model with multiple output branches.
+
+    Args:
+        input_shape (tuple, optional): input shape of single images. Defaults to (32, 32, 3).
+
+    Returns:
+        tf.keras.models.Sequential: compiled model
+    """
+    from tensorflow.python.framework.ops import disable_eager_execution
+    disable_eager_execution()
+    tf.compat.v1.experimental.output_all_intermediates(True)
+
+    inp = tf.keras.Input(shape=input_shape)
+    x = Conv2D(filters=192,
+               kernel_size=(3, 3),
+               padding="same",
+               input_shape=input_shape,
+               )(inp)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = Conv2D(filters=192,
+               kernel_size=(1, 1),
+               padding="same",
+               )(x)
+    x = Activation("relu")(x)
+
+    x = Conv2D(
+        filters=192,
+        kernel_size=(3, 3),
+        padding="same",
+        strides=2,
+    )(x)
+    x = (BatchNormalization())(x)
+    x = (Activation("relu"))(x)
+    x = (Dropout(0.5))(x)
+
+    x = Conv2D(
+        filters=96,
+        kernel_size=(3, 3),
+        padding="same",
+    )(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = Conv2D(
+        filters=96,
+        kernel_size=(1, 1),
+    )(x)
+    x = Activation("relu")(x)
+    x = Conv2D(
+        filters=96,
+        kernel_size=(1, 1),
+    )(x)
+    x = Activation("relu")(x)
+
+    x = MaxPool2D(
+        pool_size=3,
+        strides=2
+    )(x)
+    x = Dropout(0.5)(x)
+
+    # Boredom Branch
+    b0 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+        padding="same",
+    )(x)
+    b1 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+        padding="same",
+    )(b0)
+    b2 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+    )(b1)
+    b3 = Conv2D(
+        filters=4,
+        kernel_size=(1, 1),
+    )(b2)
+    b4 = GlobalAveragePooling2D()(b3)
+    b5 = Dense(
+        units=1,
+        activation="linear",
+        name="Boredom")(b4)
+
+    # Engagement Branch
+    e0 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+        padding="same",
+    )(x)
+    e1 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+        padding="same",
+    )(e0)
+    e2 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+    )(e1)
+    e3 = Conv2D(
+        filters=4,
+        kernel_size=(1, 1),
+    )(e2)
+    e4 = GlobalAveragePooling2D()(e3)
+    e5 = Dense(
+        units=1,
+        activation="linear",
+        name="Engagement")(e4)
+
+    # Confusion Branch
+    c0 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+        padding="same",
+    )(x)
+    c1 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+        padding="same",
+    )(c0)
+    c2 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+    )(c1)
+    c3 = Conv2D(
+        filters=4,
+        kernel_size=(1, 1),
+    )(c2)
+    c4 = GlobalAveragePooling2D()(c3)
+    c5 = Dense(
+        units=1,
+        activation="linear",
+        name="Confusion")(c4)
+
+    # Frustration Branch
+    f0 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+        padding="same",
+    )(x)
+    f1 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+        padding="same",
+    )(f0)
+    f2 = Conv2D(
+        filters=32,
+        kernel_size=(3, 3),
+    )(f1)
+    f3 = Conv2D(
+        filters=4,
+        kernel_size=(1, 1),
+    )(f2)
+    f4 = GlobalAveragePooling2D()(f3)
+    f5 = Dense(
+        units=1,
+        activation="linear",
+        name="Frustration")(f4)
+
+    optimizer = optimizers.Adam()
+    model = Model(inputs=inp, outputs=[b5, e5, c5, f5])
+
+    model.compile(optimizer=optimizer,
+                  loss={"Boredom": tf.keras.losses.MeanSquaredError(),
+                        "Engagement": tf.keras.losses.MeanSquaredError(),
+                        "Confusion": tf.keras.losses.MeanSquaredError(),
+                        "Frustration": tf.keras.losses.MeanSquaredError()},
                   metrics=['mse', 'accuracy'])
     # print(model.summary())
     return model
