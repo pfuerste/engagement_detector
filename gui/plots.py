@@ -123,7 +123,7 @@ class Vis_data():
                 if v:
                     ax0.text(x=i - 0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
             # TODO update with 0 people (does not get called then)?
-            ax0.text(0.85, 0.85, f'{self.current_people()} Persons in Frame',
+            ax0.text(0.65, 0.85, f'{self.current_people()} Persons in Frame',
                      fontsize=10, color='k',
                      transform=ax0.transAxes)
 
