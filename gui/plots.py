@@ -63,9 +63,10 @@ class Vis_data():
                 self.avg_frustration.append(-1)
 
     def update_max_people(self):
-        for timepoint in self.data:
-            if len(timepoint[0]) > self.max_people:
-                self.max_people = len(timepoint[0])
+        for timepoint in self.data[0]:
+            if len(timepoint) > self.max_people:
+                self.max_people = len(timepoint)
+        # print(f"updated to {self.max_people} max people")
 
     def append_data(self, new_data):
         for i, emo_data in enumerate(new_data):
@@ -120,11 +121,11 @@ class Vis_data():
             for i, v in enumerate(critical):
                 if v:
                     ax0.text(x=i - 0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
+            # TODO update with 0 people?
+            self.update_max_people()
             ax0.text(0.85, 0.85, f'{self.current_people()}/{self.max_people}',
                      fontsize=10, color='k',
-                     #ha='left', va='bottom',
                      transform=ax0.transAxes)
-            #          transform=ax0.transAxes)
 
             ax1.set_ylim(-1, 4)
             ax1.grid()
