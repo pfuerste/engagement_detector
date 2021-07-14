@@ -37,6 +37,10 @@ class Vis_data():
         self.avg_confusion = []
         self.avg_frustration = []
         for t in range(len(data[0])):
+            # Lectures with only one person get saved in a wrong way apparently?
+            if len(data[0]) == 1:
+                for i, emo in enumerate(data):
+                    data[i] = data[i][0]
             try:
                 self.avg_boredom.append(sum([x for x in data[0][t] if x != -1]) /
                                         len([x for x in data[0][t] if x != -1]))
@@ -116,9 +120,10 @@ class Vis_data():
             for i, v in enumerate(critical):
                 if v:
                     ax0.text(x=i - 0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
-            # ax0.text(0.5, 0.5, f'{self.current_people()}/{self.max_people}',
-            #          horizontalalignment='center',
-            #          verticalalignment='center',
+            ax0.text(0.85, 0.85, f'{self.current_people()}/{self.max_people}',
+                     fontsize=10, color='k',
+                     #ha='left', va='bottom',
+                     transform=ax0.transAxes)
             #          transform=ax0.transAxes)
 
             ax1.set_ylim(-1, 4)
