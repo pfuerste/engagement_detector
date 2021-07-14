@@ -25,8 +25,7 @@ def get_current_session_path(sessions_root, name):
     """Returns session_root/name/x with x being an identifier of the current time.
        Creates that dir if not present.
        Call at the beginning of a session.
-       ! In case of crash/interruption, if a new hour started since the beginning of
-       the lecture, a lecture-instance will be created on restart. !
+
     Args:
         sessions_root (str): path for data of all data
         name (str): lecture name, will be subdir in sessions_root
@@ -98,21 +97,21 @@ def save_session(save_in, ids, scores, keep=1.0):
     if scores.ndim == 3 and keep != 1.0:
         scores = sparsify(scores, keep=keep)
     dir = save_in
-    # dir = get_latest_session_path(sessions_root, name)
-    # print([x for x in os.listdir(dir) if ("ids" or "scores") in x])
-    # num = len([x for x in os.listdir(dir) if ("ids" or "scores") in x])/2
 
     # delete half-sessions:
     if os.path.isfile(os.path.join(dir, "ids.npy")):
         os.remove(os.path.join(dir, "ids.npy"))
     if os.path.isfile(os.path.join(dir, "scores.npy")):
         os.remove(os.path.join(dir, "scores.npy"))
+    # Saving after one iteration needs a new dim
+    if scores.ndim == 2:
+        scores = np.expand_dims(scores, axis=2)
+        ids = np.expand_dims(ids, axis=2)
     np.save(os.path.join(dir, "ids.npy"), ids)
     np.save(os.path.join(dir, "scores.npy"), scores)
 
 
-def load_all_sessions(sessions_root, name):
-    # TODO as_lists? Is this function needed later?
+def load_all_sessions(sessions_root, name, as_lists=False):
     """Loads ALL previous sessions of the lecture into memory.
        Memory consumption in Byte for one session: N*(128*sizeof(float)+T*4*sizeof(float))
 
@@ -124,8 +123,14 @@ def load_all_sessions(sessions_root, name):
         tuple: of lists, ids and scores, time-sorted
     """
     session_paths = get_sorted_session_paths(sessions_root, name)
+    # print(session_paths)
     ids = [np.load(os.path.join(x, "ids.npy"), allow_pickle=True) for x in session_paths]
     scores = [np.load(os.path.join(x, "scores.npy"), allow_pickle=True) for x in session_paths]
+    # for score in scores:
+    #     print(score.shape)
+    if as_lists:
+        ids = [[list(person) for person in session] for session in ids]
+        scores = [[[list(emotion) for emotion in person] for person in session] for session in scores]
     return ids, scores
 
 
@@ -140,21 +145,33 @@ def load_last_session(sessions_root, name, as_lists=False):
         tuple: ids and scores as arrays or as lists if as_lists
     """
     session_path = get_latest_session_path(sessions_root, name)
-    ids = np.load(os.path.join(session_path, "ids.npy"), allow_pickle=True)
-    scores = np.load(os.path.join(session_path, "scores.npy"), allow_pickle=True)
-    if as_lists:
-        ids = [list(person) for person in ids]
-        scores = [[list(emotion) for emotion in person] for person in scores]
-    return ids, scores
+    try:
+        ids = np.load(os.path.join(session_path, "ids.npy"), allow_pickle=True)
+        scores = np.load(os.path.join(session_path, "scores.npy"), allow_pickle=True)
+        if as_lists:
+            ids = [list(person) for person in ids]
+            scores = [[list(emotion) for emotion in person] for person in scores]
+        return ids, scores
+    except FileNotFoundError:
+        return [], []
 
 
 def last_session_difference(sessions_root, name):
+    """Returns time since last session of name started.
+
+    Args:
+        sessions_root (str): path for data of all lectures
+        name (str): lecture name
+
+    Returns:
+        float: time in minutes
+    """
     if not get_latest_session_path(sessions_root, name):
         return np.inf
     now = datetime.now()
     old_date = get_latest_session_path(sessions_root, name).split(os.sep)[-1]
     old_date = datetime.strptime(old_date, '%Y%m%d%H%M')
-    time_diff = (now - old_date).total_seconds()/60
+    time_diff = (now - old_date).total_seconds() / 60
     return time_diff
 
 
@@ -167,6 +184,8 @@ def get_old_lecture_names(sessions_root):
     Returns:
         list: all lecture names
     """
+    if not os.path.isdir(sessions_root):
+        os.makedirs(sessions_root)
     return os.listdir(sessions_root)
 
 

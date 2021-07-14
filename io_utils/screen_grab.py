@@ -1,14 +1,23 @@
-import yaml
-import os
-from PIL import ImageGrab
+from PIL import ImageGrab, Image
 from datetime import datetime
 from time import sleep
+from PIL import Image
+import numpy as np
+from win32api import GetSystemMetrics
 import win32gui
 import win32ui
 import win32con
-from ctypes import windll
-# import Image
-from PIL import Image
+
+
+def screenshot():
+    img = ImageGrab.grab()
+    return [img]
+
+
+def windowgrab(name):
+    hwnd = win32gui.FindWindow(None, name)
+    x0, y0, x1, y1 = win32gui.GetWindowRect(hwnd)
+    return background_screenshot(hwnd, x1 - abs(x0), y1 - y0)
 
 
 def background_screenshot(hwnd, width, height):
@@ -19,69 +28,38 @@ def background_screenshot(hwnd, width, height):
     dataBitMap.CreateCompatibleBitmap(dcObj, width, height)
     cDC.SelectObject(dataBitMap)
     cDC.BitBlt((0, 0), (width, height), dcObj, (0, 0), win32con.SRCCOPY)
-    dataBitMap.SaveBitmapFile(cDC, 'screenshot.bmp')
-    dcObj.DeleteDC()
-    cDC.DeleteDC()
-    win32gui.ReleaseDC(hwnd, wDC)
-    win32gui.DeleteObject(dataBitMap.GetHandle())
-
-
-def screenshot():
-    img = ImageGrab.grab()
-    # dt = datetime.now()
-    # fname = os.path.join("input", "data", "pic_{}.{}.png".format(
-    #     dt.strftime("%H%M_%S"), dt.microsecond // 100000))
-    return [img]
-
-
-if __name__ == "__main__":
-    # conf = yaml.safe_load(open("input/config.yml"))
-
-    # hwnd = win32gui.FindWindow(None, "Telegram")
-    # background_screenshot(hwnd, 1280, 780)
-    # while True:
-    #     take_screenshot()
-    #     sleep(conf["sleep_seconds"])
-#    hwnd = win32gui.FindWindow(None, 'BigBlueButton - Anwendungspraktikum')
-
-    # hwnd = win32gui.FindWindow(None, 'Telegram')
-    hwnd = win32gui.FindWindow(None, 'Zoom Meeting Participant ID: 484447')
-    # Change the line below depending on whether you want the whole window
-    # or just the client area.
-    #left, top, right, bot = win32gui.GetClientRect(hwnd)
-    left, top, right, bot = win32gui.GetWindowRect(hwnd)
-    print(left, top, right, bot)
-    w = right - left
-    h = bot - top
-
-    hwndDC = win32gui.GetWindowDC(hwnd)
-    mfcDC = win32ui.CreateDCFromHandle(hwndDC)
-    saveDC = mfcDC.CreateCompatibleDC()
-
-    saveBitMap = win32ui.CreateBitmap()
-    saveBitMap.CreateCompatibleBitmap(mfcDC, w, h)
-
-    saveDC.SelectObject(saveBitMap)
-
-    # Change the line below depending on whether you want the whole window
-    # or just the client area.
-    #result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 1)
-    result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 0)
-    print(result)
-
-    bmpinfo = saveBitMap.GetInfo()
-    bmpstr = saveBitMap.GetBitmapBits(True)
-
+    bmpinfo = dataBitMap.GetInfo()
+    bmpstr = dataBitMap.GetBitmapBits(True)
     im = Image.frombuffer(
         'RGB',
         (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
         bmpstr, 'raw', 'BGRX', 0, 1)
+    dcObj.DeleteDC()
+    cDC.DeleteDC()
+    win32gui.ReleaseDC(hwnd, wDC)
+    win32gui.DeleteObject(dataBitMap.GetHandle())
+    return [np.array(im)]
 
-    win32gui.DeleteObject(saveBitMap.GetHandle())
-    saveDC.DeleteDC()
-    mfcDC.DeleteDC()
-    win32gui.ReleaseDC(hwnd, hwndDC)
 
-    if result == 1:
-        # PrintWindow Succeeded
-        im.save("test.png")
+def window_out_of_screen(name):
+    hwnd = win32gui.FindWindow(None, name)
+    x0, y0, x1, y1 = win32gui.GetWindowRect(hwnd)
+    return coords_out_of_screen(x0, y0, x1, y1)
+
+
+def coords_out_of_screen(x0, y0, x1, y1):
+    width = GetSystemMetrics(0)
+    height = GetSystemMetrics(1)
+    if not (-20 <= x0 <= width + 20) or not (-20 <= x1 <= width + 20) or \
+       not (-20 <= y0 <= height + 20) or not (-20 <= y1 <= height + 20):
+        return True
+    return False
+
+
+if __name__ == "__main__":
+    hwnd = win32gui.FindWindow(None, "Telegram")
+    x0, y0, x1, y1 = win32gui.GetWindowRect(hwnd)
+    if coords_out_of_screen(x0, y0, x1, y1) is False:
+        # gui_running.WindowWarning()
+        print(x0, y0, x1, y1)
+    background_screenshot(hwnd, x1 - x0, y1 - y0)

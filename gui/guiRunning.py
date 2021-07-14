@@ -1,34 +1,42 @@
 from tkinter import *
-# from .plots import get_avg_plots
 
 
 class Application(Frame):
 
     def __init__(self, master=None):
-        self.root = Tk()
-        self.root.title("Engagement Detector")
-        self.root.geometry("400x800+0+0")
-        Frame.__init__(self, master=self.root)
-        #matplotlib.rcParams["figure.figsize"] = [6, 2]
-        #self.data_set = [1, 2, 3, 4, 5, 6]
+        self.ende = False
+        Frame.__init__(self, master)
         self.initUI()
-
         # to assign widgets
         self.widget = None
         self.toolbar = None
-        # self.mainloop()
-        self.update()
+
+    def getEnde(self):
+        return self.ende
+
+    def Sende(self):
+        self.ende = True
+        print("Will close shortly.")
+        self.quit()
 
     def initUI(self):
         self.pack(fill=BOTH, expand=1)
+        quitbutton = Button(self, text="Quit", command=self.Sende, height=2, width=40)
+        quitbutton.pack(side=TOP)
 
-        plotbutton = Button(self, text="Plot Data", command=self.alpha)
-        plotbutton.place(relx=0.2, rely=0.9)
+    def WindowWarning(self, text):
+        warning = Label(self, text=text, bg="red")
+        warning.pack(side=TOP)
+        self.after(10000, warning.pack_forget)
 
-        quitbutton = Button(self, text="Quit", command=self.quit)
-        quitbutton.place(relx=0.6, rely=0.9)
-
-    def alpha(self, vis_data):
+    def intra_avg_plot(self, vis_data):
         vis_data.get_avg_plots(window=self)
         self.update()
-        # self.after(1000, self.alpha)
+
+    def inter_avg_plot(self, session_data):
+        session_data.get_avg_plots(window=self)
+        self.update()
+
+    def inter_emo_plot(self, session_data, emo_id):
+        session_data.get_emotion_plot(self, emo_id)
+        self.update()
