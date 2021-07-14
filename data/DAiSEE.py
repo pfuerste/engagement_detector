@@ -45,11 +45,12 @@ def get_flowing_datagen(datagen, df, subset, size=None):
     """
     root = yaml.safe_load(open("config.yml"))["root"]
     data_root = yaml.safe_load(open(os.path.join(root, "data/config.yml")))["data_root"]
-    if os.path.isdir(os.path.join(data_root, "DataSet", "Face" + subset + str(size[0]), "Face" + subset + str(size[0]))):
-      subdir = os.path.join(data_root, "DataSet", "Face" + subset + str(size[0]), "Face" + subset + str(size[0]))
-    else: 
-      subdir = os.path.join(data_root, "DataSet", "Face" + subset + str(size[0]))
-    print(f"Subdir: {subdir}")    
+    if os.path.isdir(os.path.join(data_root, "DataSet", "Face" + subset +
+                     str(size[0]), "Face" + subset + str(size[0]))):
+        subdir = os.path.join(data_root, "DataSet", "Face" + subset + str(size[0]), "Face" + subset + str(size[0]))
+    else:
+        subdir = os.path.join(data_root, "DataSet", "Face" + subset + str(size[0]))
+    print(f"Subdir: {subdir}")
     subset = "training" if subset == "Train" else "validation"
     shuffle = True if subset == "training" else False
     target_size = (32, 32) if not size else size
