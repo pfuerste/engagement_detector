@@ -62,6 +62,7 @@ class Vis_data():
             except ZeroDivisionError:
                 self.avg_frustration.append(-1)
 
+    # ! Only max people in a single frame. Vis dataa has no encodings right now and cant add up real number of people
     def update_max_people(self):
         for timepoint in self.data[0]:
             if len(timepoint) > self.max_people:
@@ -121,9 +122,8 @@ class Vis_data():
             for i, v in enumerate(critical):
                 if v:
                     ax0.text(x=i - 0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
-            # TODO update with 0 people?
-            self.update_max_people()
-            ax0.text(0.85, 0.85, f'{self.current_people()}/{self.max_people}',
+            # TODO update with 0 people (does not get called then)?
+            ax0.text(0.85, 0.85, f'{self.current_people()} Persons in Frame',
                      fontsize=10, color='k',
                      transform=ax0.transAxes)
 
