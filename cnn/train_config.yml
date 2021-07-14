@@ -1,7 +1,7 @@
-root: C:\Users\phili\_Documents\SS21\AWP\engagement_detector
-data_root: C:\Users\phili\Documents\Datasets\DAiSEE
-model: C:\Users\phili\_Documents\SS21\AWP\engagement_detector\cnn\models\untuned_final_func.hdf5
-logs: C:\Users\phili\_Documents\SS21\AWP\engagement_detector\logs
+root: /content/engagement_detector
+data_root: /content/drive/MyDrive/DAiSEE_upload64
+model: /content/drive/MyDrive/models
+logs: /content/drive/MyDrive/logs
 epochs: 100
 steps: 50
 val_steps: 20
