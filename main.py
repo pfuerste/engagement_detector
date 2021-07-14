@@ -163,8 +163,8 @@ def main():
                             t += 1
                             continue
                         # Does not find encodings on just face, needs to take whole image
-                        enc = face_recognition.face_encodings(img, [loc])
-                        # enc = face_recognition.face_encodings(cv2.resize(*face, (64, 64)), [loc])
+                        # enc = face_recognition.face_encodings(img, [loc])
+                        enc = face_recognition.face_encodings(cv2.resize(*face, (64, 64)), [loc])
                         curr_encodings.append(enc[0])
             if not faces:
                 longest_t = t

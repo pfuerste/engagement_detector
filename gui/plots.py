@@ -202,7 +202,6 @@ class Inter_session():
                 for j, id in enumerate(ids):
                     ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.6)
                     ret = [1 if x else 0 for x in ret]
-                    print(ret)
                     # Person was not present in earlier lecture
                     if sum(ret) == 0:
                         checked_ids.append(id)
@@ -229,7 +228,7 @@ class Inter_session():
                 last_person += session.shape[0]
             else:
                 for j, id in enumerate(ids):
-                    ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.3)
+                    ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.6)
                     ret = [1 if x else 0 for x in ret]
                     if sum(ret) == 0:
                         all_person_data[last_person, curr_time:curr_time + session.shape[2]] = session[j, emo_ind, :]
