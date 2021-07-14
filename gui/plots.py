@@ -15,6 +15,7 @@ class Vis_data():
 
     def __init__(self):
         self.data = [[], [], [], []]
+        self.max_people = -1
         self.avg_boredom = []
         self.avg_engagement = []
         self.avg_confusion = []
@@ -29,6 +30,8 @@ class Vis_data():
         data = np.swapaxes(data, 1, 2)
         data = [[[p for p in emotion] for emotion in t] for t in data]
         self.data = data
+        self.max_people = -1
+        self.update_max_people()
         self.avg_boredom = []
         self.avg_engagement = []
         self.avg_confusion = []
@@ -55,10 +58,16 @@ class Vis_data():
             except ZeroDivisionError:
                 self.avg_frustration.append(-1)
 
+    def update_max_people(self):
+        for timepoint in self.data:
+            if len(timepoint[0]) > self.max_people:
+                self.max_people = len(timepoint[0])
+
     def append_data(self, new_data):
         for i, emo_data in enumerate(new_data):
             self.data[i].append(emo_data)
         self.append_averages(new_data)
+        self.update_max_people()
 
     def append_averages(self, new_data):
         new_averages = [sum(x) / len(x) for x in new_data]
@@ -73,6 +82,9 @@ class Vis_data():
 
     def current_data(self):
         return [self.data[0][-1], self.data[1][-1], self.data[2][-1], self.data[3][-1]]
+
+    def current_people(self):
+        return len(self.data[0][-1])
 
     def is_critical_level(self, share=0.1):
         curr = self.current_data()
@@ -104,6 +116,10 @@ class Vis_data():
             for i, v in enumerate(critical):
                 if v:
                     ax0.text(x=i - 0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
+            # ax0.text(0.5, 0.5, f'{self.current_people()}/{self.max_people}',
+            #          horizontalalignment='center',
+            #          verticalalignment='center',
+            #          transform=ax0.transAxes)
 
             ax1.set_ylim(-1, 4)
             ax1.grid()

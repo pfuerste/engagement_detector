@@ -276,7 +276,7 @@ def get_func_model(input_shape=(64, 64, 3)):
                         "Frustration": 'sparse_categorical_crossentropy'},
                   metrics=['sparse_categorical_crossentropy', 'accuracy'])
 
-    print(model.summary())
+    # print(model.summary())
     return model
 
 
