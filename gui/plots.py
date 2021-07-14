@@ -200,8 +200,9 @@ class Inter_session():
                 checked_ids.extend(ids)
             else:
                 for j, id in enumerate(ids):
-                    ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.3)
+                    ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.6)
                     ret = [1 if x else 0 for x in ret]
+                    print(ret)
                     # Person was not present in earlier lecture
                     if sum(ret) == 0:
                         checked_ids.append(id)
@@ -215,6 +216,7 @@ class Inter_session():
 
         # Create array -1s of shape (num_people, all_timesteps)
         all_person_data = np.ones(shape=(len(checked_ids), sum(self.session_lengths))) * -1
+        print(all_person_data.shape)
         # for session: put person @ its slot
         curr_time = 0
         last_person = 0

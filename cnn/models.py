@@ -471,5 +471,7 @@ def batchify(list, img_shape=(64, 64, 3)):
 
 
 if __name__ == "__main__":
-    get_func_model()
+    model = get_func_model()
+    from tensorflow.keras.utils import plot_model
+    plot_model(model, to_file='model.png')
     pass

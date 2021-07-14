@@ -15,6 +15,7 @@ import gui.guiStart
 import threading
 from tkinter import *
 import ctypes
+import cv2
 
 
 def fill_up_inference_data(inferences, t, index=None):
@@ -71,9 +72,10 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
     # "Usual" case: Found faces during lecture
     rets = dict(zip(range(len(all_encodings) + 1), [0] * (len(all_encodings) + 1)))
     for preds, encoding in zip(new_inferences, curr_encodings):
-        ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.3)
+        ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.6)
         ret = [1 if x else 0 for x in ret]
         rets[sum(ret)] += 1
+        # print(rets)
         # Same faces found in earlier iteration: Append to corresponding data after filling gaps there
         if sum(ret) == 1:
             person_index = ret.index(1)
@@ -89,11 +91,11 @@ def manage_encodings(person_data, new_inferences, all_encodings, curr_encodings,
         # This person is similar to multiple people from earlier. Decrease Encoding distance iterativly.
         # If still similar to multiples, just ignore the person for this iteration and dont append its data.
         else:
-            tol = 0.3
+            tol = 0.45
             similarity_handled = False
             for i in range(3):
                 tol *= 0.75
-                ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=0.3)
+                ret = face_recognition.compare_faces(all_encodings, encoding, tolerance=tol)
                 ret = [1 if x else 0 for x in ret]
                 if sum(ret) == 1:
                     person_index = ret.index(1)
@@ -162,6 +164,7 @@ def main():
                             continue
                         # Does not find encodings on just face, needs to take whole image
                         enc = face_recognition.face_encodings(img, [loc])
+                        # enc = face_recognition.face_encodings(cv2.resize(*face, (64, 64)), [loc])
                         curr_encodings.append(enc[0])
             if not faces:
                 longest_t = t
