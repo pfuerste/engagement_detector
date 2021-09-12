@@ -2,6 +2,7 @@ import os
 import sys
 import yaml
 import tqdm
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import confusion_matrix, accuracy_score, mean_squared_error
@@ -78,14 +79,66 @@ def test_model(model, generator, num=1):
     # print(c_matrix)
 
 
+def test_face_recog(data_root):
+    def get_big_dirs(test_root, m):
+        min_len = 0
+        while min_len < m:
+            subject_dirs = [os.path.join(test_root, x) for x in np.random.choice(os.listdir(test_root), m, replace=False)]
+            test_dirs = [os.path.join(s_dir, np.random.choice(os.listdir(s_dir), replace=False)) for s_dir in subject_dirs]
+            min_len = min([len(os.listdir(test_dir)) for test_dir in test_dirs])
+        return test_dirs
+
+    m = 20
+    n = 16
+    frames = 20
+    # get random dirs of follow-up frames
+    test_root = os.path.join(data_root, "DataSet", "FaceTest64")
+    # Some dirs are to small to retrieve enough frames
+    test_dirs = get_big_dirs(test_root, m)
+    imgs = {test_dir: list() for test_dir in test_dirs}
+
+    # retrieve similar frames for all subjects
+    for test_dir in test_dirs:
+        i = os.listdir(test_dir)[:frames]
+        for frame in i:
+            imgs[test_dir].append(plt.imread(os.path.join(test_dir, frame)))
+            dtype = imgs[test_dir][-1].dtype
+
+    # dicts are not ordered but we want easy indexed access
+    ind_to_dict = dict()
+    dict_to_int = dict()
+    for i, d in enumerate(test_dirs):
+        ind_to_dict[i] = d
+        dict_to_int[d] = i
+
+    gts = dict()
+    # generate empty images and fill them with random persons' frames
+    bar_size = 10
+    dummy_vid = np.zeros((64 * 2 + 3 * bar_size, 64 * 8 + 9 * bar_size, frames*3), dtype=dtype)
+    for f in range(frames):
+        rand_inds = np.random.choice(range(len(test_dirs)), n, replace=False)
+        for i in range(int(n / (n / 2))):
+            for j in range(int(n / 2)):
+                # indexing is fun
+                paste = imgs[ind_to_dict[rand_inds[i * int(n / 2) + j]]][f]
+                dummy_vid[(i + 1) * bar_size + i * 64:(i + 1) * bar_size +
+                          i * 64 + 64, (j + 1) * bar_size + j * 64:(j + 1) * bar_size + j * 64 + 64, f*3:f*3+3] = paste
+
+
 if __name__ == "__main__":
     root = yaml.safe_load(open("config.yml"))["root"]
     data_root = yaml.safe_load(open("config.yml"))["data_root"]
     model_dir = os.path.join(root, "cnn", "models")
-    model = get_func_model()
-    model.load_weights(os.path.join(model_dir, "untuned_final_func.hdf5"))
 
-    test_df = dai.get_dataframe("Test")
-    test_datagen = dai.get_flowing_datagen(dai.get_datagen(), test_df, "Test", (64, 64))
+    def start_model_test():
+        model = get_func_model()
+        model.load_weights(os.path.join(model_dir, "untuned_final_func.hdf5"))
+        test_df = dai.get_dataframe("Test")
+        test_datagen = dai.get_flowing_datagen(dai.get_datagen(), test_df, "Test", (64, 64))
 
-    test_model(model, test_datagen, 500)
+        test_model(model, test_datagen, 500)
+
+    def start_face_test():
+        test_face_recog(data_root)
+
+    start_face_test()
