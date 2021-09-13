@@ -185,9 +185,15 @@ if __name__ == "__main__":
 
         test_model(model, test_datagen, 500)
 
-    #def start_face_test():
-    num_tests, num_right, num_detections = test_face_recog(data_root)
-    acc_compares = num_right/num_tests
-    print(acc_compares)
-    acc_detections = sum([frame/16 for frame in num_detections])/20
-    print(acc_detections)
+    global_acc_compares, global_acc_detections = 0, 0
+    num = 50
+    for i in tqdm.tqdm(range(num)):
+        num_tests, num_right, num_detections = test_face_recog(data_root)
+        acc_compares = num_right/num_tests
+        print(acc_compares)
+        acc_detections = sum([frame/16 for frame in num_detections])/20
+        print(acc_detections)
+        global_acc_compares += acc_compares
+        global_acc_detections += acc_detections
+    print(f"Accuracy for detections of faces after {num} trials of mock-up videos: {global_acc_detections/num}")
+    print(f"Accuracy for compares of faces (regarding number of recognized faces in each next frame) after {num} trials of mock-up videos: {global_acc_compares/num}")
