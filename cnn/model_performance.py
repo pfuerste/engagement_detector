@@ -111,18 +111,21 @@ def test_face_recog(data_root):
         ind_to_dict[i] = d
         dict_to_int[d] = i
 
-    gts = dict()
+    # generate gts: list with dict of indices per frame
+    gts = list()
     # generate empty images and fill them with random persons' frames
     bar_size = 10
     dummy_vid = np.zeros((64 * 2 + 3 * bar_size, 64 * 8 + 9 * bar_size, frames*3), dtype=dtype)
     for f in range(frames):
         rand_inds = np.random.choice(range(len(test_dirs)), n, replace=False)
+        gts.append({ind: ind_to_dict[ind] for ind in rand_inds})
         for i in range(int(n / (n / 2))):
             for j in range(int(n / 2)):
-                # indexing is fun
                 paste = imgs[ind_to_dict[rand_inds[i * int(n / 2) + j]]][f]
                 dummy_vid[(i + 1) * bar_size + i * 64:(i + 1) * bar_size +
                           i * 64 + 64, (j + 1) * bar_size + j * 64:(j + 1) * bar_size + j * 64 + 64, f*3:f*3+3] = paste
+
+    
 
 
 if __name__ == "__main__":
