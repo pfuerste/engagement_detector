@@ -1,15 +1,18 @@
 import os
 import sys
+from face_recognition.api import face_encodings
 import yaml
 import tqdm
-import cv2
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+import face_recognition as fr
 from sklearn.metrics import confusion_matrix, accuracy_score, mean_squared_error
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('.'))
 from models import get_model, get_func_model
 import data.DAiSEE as dai
+from io_utils import face_extract as fe
+from io_utils.utils import crop_bbs
 
 
 def test_model(model, generator, num=1):
@@ -80,21 +83,28 @@ def test_model(model, generator, num=1):
 
 
 def test_face_recog(data_root):
-    def get_big_dirs(test_root, m):
+    def get_big_dirs(test_root, frames):
         min_len = 0
-        while min_len < m:
-            subject_dirs = [os.path.join(test_root, x) for x in np.random.choice(os.listdir(test_root), m, replace=False)]
-            test_dirs = [os.path.join(s_dir, np.random.choice(os.listdir(s_dir), replace=False)) for s_dir in subject_dirs]
+        while min_len < frames:
+            subject_dirs = [
+                os.path.join(
+                    test_root,
+                    x) for x in np.random.choice(
+                    os.listdir(test_root),
+                    m,
+                    replace=False)]
+            test_dirs = [os.path.join(s_dir, np.random.choice(os.listdir(s_dir), replace=False))
+                         for s_dir in subject_dirs]
             min_len = min([len(os.listdir(test_dir)) for test_dir in test_dirs])
         return test_dirs
 
-    m = 20
+    m = 16
     n = 16
     frames = 20
     # get random dirs of follow-up frames
     test_root = os.path.join(data_root, "DataSet", "FaceTest64")
     # Some dirs are to small to retrieve enough frames
-    test_dirs = get_big_dirs(test_root, m)
+    test_dirs = get_big_dirs(test_root, frames)
     imgs = {test_dir: list() for test_dir in test_dirs}
 
     # retrieve similar frames for all subjects
@@ -115,7 +125,7 @@ def test_face_recog(data_root):
     gts = list()
     # generate empty images and fill them with random persons' frames
     bar_size = 10
-    dummy_vid = np.zeros((64 * 2 + 3 * bar_size, 64 * 8 + 9 * bar_size, frames*3), dtype=dtype)
+    dummy_vid = np.zeros((64 * 2 + 3 * bar_size, 64 * 8 + 9 * bar_size, frames * 3), dtype=dtype)
     for f in range(frames):
         rand_inds = np.random.choice(range(len(test_dirs)), n, replace=False)
         gts.append({ind: ind_to_dict[ind] for ind in rand_inds})
@@ -123,9 +133,43 @@ def test_face_recog(data_root):
             for j in range(int(n / 2)):
                 paste = imgs[ind_to_dict[rand_inds[i * int(n / 2) + j]]][f]
                 dummy_vid[(i + 1) * bar_size + i * 64:(i + 1) * bar_size +
-                          i * 64 + 64, (j + 1) * bar_size + j * 64:(j + 1) * bar_size + j * 64 + 64, f*3:f*3+3] = paste
+                          i * 64 + 64, (j + 1) * bar_size + j * 64:(j + 1) * bar_size + j * 64 + 64, f * 3:f * 3 + 3] = paste
 
-    
+    # run face detection and save number of detected faces for each frame
+    num_detections = list()
+    encodings = list()
+    for i in range(frames):
+        img = dummy_vid[..., i * 3:i * 3 + 3]
+        locs = fe.face_recog_extract(img)
+        detections = []
+        for loc in locs:
+            detections.append(loc)
+        num_detections.append(len(detections))
+        encodings.append(fr.face_encodings(img, detections))
+
+    # check if there is always exactly one similar face in the next frame (as it should be)
+    all_hits = list()
+    for f in range(frames - 1):
+        for enc in encodings[f]:
+            tol = 0.6
+            ret = fr.compare_faces(encodings[f + 1], enc, tolerance=tol)
+            ret = [1 if x else 0 for x in ret]
+            hits = sum(ret)
+            if hits > 1:
+                for i in range(3):
+                    tol *= 0.75
+                    ret = fr.compare_faces(encodings[f + 1], enc, tolerance=tol)
+                    ret = [1 if x else 0 for x in ret]
+                    hits = sum(ret)
+                    if hits <= 1:
+                        all_hits.append(hits)
+                        continue
+                    elif i == 2:
+                        all_hits.append(hits)
+                    else:
+                        pass
+
+    return(len(all_hits), sum(all_hits), num_detections)
 
 
 if __name__ == "__main__":
@@ -141,7 +185,9 @@ if __name__ == "__main__":
 
         test_model(model, test_datagen, 500)
 
-    def start_face_test():
-        test_face_recog(data_root)
-
-    start_face_test()
+    #def start_face_test():
+    num_tests, num_right, num_detections = test_face_recog(data_root)
+    acc_compares = num_right/num_tests
+    print(acc_compares)
+    acc_detections = sum([frame/16 for frame in num_detections])/20
+    print(acc_detections)
