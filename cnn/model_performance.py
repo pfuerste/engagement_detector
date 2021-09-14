@@ -58,28 +58,28 @@ def test_model(model, generator, num=1):
     print(f"b_acc: {b_acc}")
     print(f"b_mse: {b_mse}")
     b_matrix = confusion_matrix(b_labels, b_predictions, labels=[0, 1, 2, 3])
-    # print(b_matrix)
+    print(b_matrix)
 
     e_acc = accuracy_score(e_labels, e_predictions)
     e_mse = mean_squared_error(e_labels, e_predictions)
     print(f"e_acc: {e_acc}")
     print(f"e_mse: {e_mse}")
     e_matrix = confusion_matrix(e_labels, e_predictions, labels=[0, 1, 2, 3])
-    # print(e_matrix)
+    print(e_matrix)
 
     f_acc = accuracy_score(f_labels, f_predictions)
     f_mse = mean_squared_error(f_labels, f_predictions)
     print(f"f_acc: {f_acc}")
     print(f"f_mse: {f_mse}")
     f_matrix = confusion_matrix(f_labels, f_predictions, labels=[0, 1, 2, 3])
-    # print(f_matrix)
+    print(f_matrix)
 
     c_acc = accuracy_score(c_labels, c_predictions)
     c_mse = mean_squared_error(c_labels, c_predictions)
     print(f"c_acc: {c_acc}")
     print(f"c_mse: {c_mse}")
     c_matrix = confusion_matrix(c_labels, c_predictions, labels=[0, 1, 2, 3])
-    # print(c_matrix)
+    print(c_matrix)
 
 
 def test_face_recog(data_root):
@@ -135,6 +135,11 @@ def test_face_recog(data_root):
                 dummy_vid[(i + 1) * bar_size + i * 64:(i + 1) * bar_size +
                           i * 64 + 64, (j + 1) * bar_size + j * 64:(j + 1) * bar_size + j * 64 + 64, f * 3:f * 3 + 3] = paste
 
+    # plt.imshow(dummy_vid[..., 0:3])
+    # plt.axis('off')
+
+    # plt.show()
+    # return
     # run face detection and save number of detected faces for each frame
     num_detections = list()
     encodings = list()
@@ -183,17 +188,18 @@ if __name__ == "__main__":
         test_df = dai.get_dataframe("Test")
         test_datagen = dai.get_flowing_datagen(dai.get_datagen(), test_df, "Test", (64, 64))
 
-        test_model(model, test_datagen, 500)
+        test_model(model, test_datagen, 1)
 
-    global_acc_compares, global_acc_detections = 0, 0
-    num = 50
-    for i in tqdm.tqdm(range(num)):
-        num_tests, num_right, num_detections = test_face_recog(data_root)
-        acc_compares = num_right/num_tests
-        print(acc_compares)
-        acc_detections = sum([frame/16 for frame in num_detections])/20
-        print(acc_detections)
-        global_acc_compares += acc_compares
-        global_acc_detections += acc_detections
-    print(f"Accuracy for detections of faces after {num} trials of mock-up videos: {global_acc_detections/num}")
-    print(f"Accuracy for compares of faces (regarding number of recognized faces in each next frame) after {num} trials of mock-up videos: {global_acc_compares/num}")
+    start_model_test()
+    # global_acc_compares, global_acc_detections = 0, 0
+    # num = 50
+    # for i in tqdm.tqdm(range(num)):
+    #     num_tests, num_right, num_detections = test_face_recog(data_root)
+    #     acc_compares = num_right/num_tests
+    #     print(acc_compares)
+    #     acc_detections = sum([frame/16 for frame in num_detections])/20
+    #     print(acc_detections)
+    #     global_acc_compares += acc_compares
+    #     global_acc_detections += acc_detections
+    # print(f"Accuracy for detections of faces after {num} trials of mock-up videos: {global_acc_detections/num}")
+    # print(f"Accuracy for compares of faces (regarding number of recognized faces in each next frame) after {num} trials of mock-up videos: {global_acc_compares/num}")
