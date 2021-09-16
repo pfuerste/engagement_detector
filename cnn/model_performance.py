@@ -49,7 +49,7 @@ def test_model(model, generator, num=1):
         # the entire once (otherwise we would end up with duplicates).
         if len(b_predictions) == num * 32:
             break
-
+    print(b_predictions)
     # print(list(zip(b_labels, b_predictions)))
     # print(list(zip(e_labels, e_predictions)))
     # print(len(b_labels), len(b_predictions))
@@ -188,7 +188,7 @@ if __name__ == "__main__":
         test_df = dai.get_dataframe("Test")
         test_datagen = dai.get_flowing_datagen(dai.get_datagen(), test_df, "Test", (64, 64))
 
-        test_model(model, test_datagen, 1)
+        test_model(model, test_datagen, 500)
 
     start_model_test()
     # global_acc_compares, global_acc_detections = 0, 0
