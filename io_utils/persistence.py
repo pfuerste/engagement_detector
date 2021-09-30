@@ -10,7 +10,8 @@ def sparsify(arr, ax=2, keep=0.25):
     Args:
         arr (np.array): initial array
         ax (int, optional): axis on which to delete elements. Defaults to 2.
-        keep (float, optional): ratio of how may elements to keep along axis. Defaults to 0.25.
+        keep (float, optional): ratio of how may elements to keep along axis.
+                                Defaults to 0.25.
 
     Returns:
         np.array: reduced array
@@ -92,7 +93,8 @@ def save_session(save_in, ids, scores, keep=1.0):
         save_in (str): path of current lecture dir
         ids (np.array): array of face encodings
         scores (np.array): array of engagement scores
-        keep (float, optional): ratio of how much of score's last dim to keep. Defaults to 1.0.
+        keep (float, optional): ratio of how much of score's last dim to keep.
+                                Defaults to 1.0.
     """
     if scores.ndim == 3 and keep != 1.0:
         scores = sparsify(scores, keep=keep)
@@ -113,7 +115,8 @@ def save_session(save_in, ids, scores, keep=1.0):
 
 def load_all_sessions(sessions_root, name, as_lists=False):
     """Loads ALL previous sessions of the lecture into memory.
-       Memory consumption in Byte for one session: N*(128*sizeof(float)+T*4*sizeof(float))
+       Memory consumption in Byte for one session:
+                                N*(128*sizeof(float)+T*4*sizeof(float))
 
     Args:
         sessions_root (str): path for data of all lectures
@@ -193,8 +196,8 @@ if __name__ == "__main__":
     sessions_root = yaml.safe_load(open("config.yml"))["logs"]
     print(get_old_lecture_names(sessions_root))
     # os.makedirs(get_current_session_path(sessions_root, "test"))
-    #load_last_session(sessions_root, "Test", True)
-    #print(get_sorted_session_paths(sessions_root, "test"))
+    # load_last_session(sessions_root, "Test", True)
+    # print(get_sorted_session_paths(sessions_root, "test"))
     # a = np.array([np.arange(0, 20), np.arange(0, 20)])
     # print(sparsify(a, 0, 0.5))
     pass
