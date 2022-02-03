@@ -14,13 +14,31 @@ def screenshot():
     return [img]
 
 
-def windowgrab(name):
+def window_grab(name):
+    """Gets the name of the window, which has to be captured
+        and returns screenshot
+        Args:
+            name (string): name of the window
+
+        Returns:
+            np.array from background_screenshot
+    """
     hwnd = win32gui.FindWindow(None, name)
     x0, y0, x1, y1 = win32gui.GetWindowRect(hwnd)
     return background_screenshot(hwnd, x1 - abs(x0), y1 - y0)
 
 
 def background_screenshot(hwnd, width, height):
+    """Gets the parameters of the window, which has to be captured
+        and returns screenshot
+        Args:
+            name (string): name of the window
+            width (int): width of window
+            height (int): height of window
+
+        Returns:
+            picture as np.array
+    """
     wDC = win32gui.GetWindowDC(hwnd)
     dcObj = win32ui.CreateDCFromHandle(wDC)
     cDC = dcObj.CreateCompatibleDC()
@@ -42,12 +60,34 @@ def background_screenshot(hwnd, width, height):
 
 
 def window_out_of_screen(name):
+    """Check if window is not complete on screen
+
+        Args:
+            name (string): name of the window
+
+        Returns:
+            boolean from coords_out_of_screen
+
+    """
     hwnd = win32gui.FindWindow(None, name)
     x0, y0, x1, y1 = win32gui.GetWindowRect(hwnd)
     return coords_out_of_screen(x0, y0, x1, y1)
 
 
 def coords_out_of_screen(x0, y0, x1, y1):
+    """Check if window is not complete on screen
+
+        Args:
+            name (string): name of the window
+            x0 (int): top left corner
+            y0 (int): top left corner
+            x1 (int): bottom right corner
+            y1 (int): bottom right corner
+
+        Returns:
+            True or False
+
+    """
     width = GetSystemMetrics(0)
     height = GetSystemMetrics(1)
     if not (-20 <= x0 <= width + 20) or not (-20 <= x1 <= width + 20) or \

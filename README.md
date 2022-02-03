@@ -1,10 +1,16 @@
 # engagement_detector
 
+## Before program starts
+- change roots in config.yml in root directory
+- disable hardware acceleration for window capture
+
+
+
 ## Proposed tools:
-- CV2 (opencv, for simple CV tasks)
+- Facerecognition Library and PIL
 - Keras (for CNNs, may change after research for existing models)
 - pytest (Testing)
-- pyqt (GUI)
+- TKinter (GUI)
 
 ## Git:
 - main (only merge into after review/testing)

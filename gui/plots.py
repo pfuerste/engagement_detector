@@ -22,6 +22,12 @@ class Vis_data():
         self.avg_frustration = []
 
     def reload_old_data(self, person_data):
+        """reloads known data
+
+        Args:
+            self: Vis_data class
+            person_data: ids and scores as arrays or as lists if as_lists
+        """
         scores = np.array(person_data)
         if scores.size == 0:
             # Else reloading on empty data crashes
@@ -37,7 +43,8 @@ class Vis_data():
         self.avg_confusion = []
         self.avg_frustration = []
         for t in range(len(data[0])):
-            # Lectures with only one person get saved in a wrong way apparently?
+            # Lectures with only one person get saved in a wrong way
+            # apparently?
             if len(data[0]) == 1:
                 for i, emo in enumerate(data):
                     data[i] = data[i][0]
@@ -62,20 +69,37 @@ class Vis_data():
             except ZeroDivisionError:
                 self.avg_frustration.append(-1)
 
-    # ! Only max people in a single frame. Vis dataa has no encodings right now and cant add up real number of people
+    # ! Only max people in a single frame. Vis data has no encodings right now
+    # and cant add up real number of people
     def update_max_people(self):
+        """update max people in current frame
+
+        Args:
+            self: vis_data class
+        """
         for timepoint in self.data[0]:
             if len(timepoint) > self.max_people:
                 self.max_people = len(timepoint)
-        # print(f"updated to {self.max_people} max people")
 
     def append_data(self, new_data):
+        """Update visualization data
+
+        Args:
+            self: vis_data class
+            new_data: specific data from np.array
+        """
         for i, emo_data in enumerate(new_data):
             self.data[i].append(emo_data)
         self.append_averages(new_data)
         self.update_max_people()
 
     def append_averages(self, new_data):
+        """Update visualization data
+
+        Args:
+            self: vis_data class
+            new_data: specific data from np.array
+        """
         new_averages = [sum(x) / len(x) for x in new_data]
         self.avg_boredom.append(new_averages[0])
         self.avg_engagement.append(new_averages[1])
@@ -83,16 +107,57 @@ class Vis_data():
         self.avg_frustration.append(new_averages[3])
 
     def current_avgs(self):
+        """Return current average datas
+
+        Args:
+            self: vis_data class
+
+        Returns:
+            avg_boredom (int): value
+            avg_engagement (int): value
+            avg_confusion (int): value
+            avg_frustration (int): value
+
+        """
         return self.avg_boredom[-1], self.avg_engagement[-1], \
             self.avg_confusion[-1], self.avg_frustration[-1]
 
     def current_data(self):
-        return [self.data[0][-1], self.data[1][-1], self.data[2][-1], self.data[3][-1]]
+        """Return current data
+
+        Args:
+            self: vis_data class
+
+        Returns:
+            values of list
+
+        """
+        return [self.data[0][-1], self.data[1][-1],
+                self.data[2][-1], self.data[3][-1]]
 
     def current_people(self):
+        """Return current number of people
+
+        Args:
+            self: vis_data class
+
+        Returns:
+            length of self.Data[0][1]
+
+        """
         return len(self.data[0][-1])
 
     def is_critical_level(self, share=0.1):
+        """check if a critical amout of people reaches a specific level
+
+        Args:
+            self: vis_data class
+            share (double): percent of people
+
+        Returns:
+            list: critical
+        """
+
         curr = self.current_data()
         people = len(curr[0])
         critical = []
@@ -106,6 +171,12 @@ class Vis_data():
 
     # intra-session plotting
     def get_avg_plots(self, window):
+        """Create intra session average plot
+
+        Args:
+            self: vis_data class
+            window: window of gui_running
+        """
         if window.widget:
             window.widget.destroy()
         # break if used without data
@@ -121,7 +192,13 @@ class Vis_data():
             critical = self.is_critical_level()
             for i, v in enumerate(critical):
                 if v:
-                    ax0.text(x=i - 0.1, y=1, s="!", color='y', fontweight='bold', fontsize=30)
+                    ax0.text(
+                        x=i - 0.1,
+                        y=1,
+                        s="!",
+                        color='y',
+                        fontweight='bold',
+                        fontsize=30)
             # TODO update with 0 people (does not get called then)?
             ax0.text(0.35, 0.85, f'{self.current_people()} Persons in Frame',
                      fontsize=10, color='k',
@@ -129,10 +206,14 @@ class Vis_data():
 
             ax1.set_ylim(-1, 4)
             ax1.grid()
-            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_boredom, c="black")
-            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_engagement, c="green")
-            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_confusion, c="purple")
-            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_frustration, c="red")
+            ax1.plot(range(1, len(self.avg_boredom) + 1),
+                     self.avg_boredom, c="black")
+            ax1.plot(range(1, len(self.avg_boredom) + 1),
+                     self.avg_engagement, c="green")
+            ax1.plot(range(1, len(self.avg_boredom) + 1),
+                     self.avg_confusion, c="purple")
+            ax1.plot(range(1, len(self.avg_boredom) + 1),
+                     self.avg_frustration, c="red")
 
             canvas = FigureCanvasTkAgg(fig, master=window.master)
             window.widget = canvas.get_tk_widget()
@@ -141,12 +222,20 @@ class Vis_data():
 
 # inter-session plotting
 class Inter_session():
+    """Intersession Plots/ Visualize and send to GUI"""
 
     def __init__(self, log_dir, lecture_name):
         self.sessions_data = load_all_sessions(log_dir, lecture_name, True)
+        print(self.sessions_data)
         self.session_lengths = []
 
     def get_avg_plots(self, window):
+        """Create inter session average plot
+
+        Args:
+            self: inter_session class
+            window: window of gui_running
+        """
         self.sessions_vis_data = []
         self.avg_boredom = []
         self.avg_engagement = []
@@ -162,8 +251,6 @@ class Inter_session():
             self.avg_engagement.extend(vis_data.avg_engagement)
             self.avg_confusion.extend(vis_data.avg_confusion)
             self.avg_frustration.extend(vis_data.avg_frustration)
-        # if window.widget:
-        #    window.widget.destroy()
 
         # break if used without data
         if not self.avg_boredom:
@@ -172,10 +259,14 @@ class Inter_session():
             fig, ax1 = plt.subplots(1, 1)
             ax1.set_ylim(-1, 4)
             ax1.grid()
-            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_boredom, c="black")
-            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_engagement, c="green")
-            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_confusion, c="purple")
-            ax1.plot(range(1, len(self.avg_boredom) + 1), self.avg_frustration, c="red")
+            ax1.plot(range(1, len(self.avg_boredom) + 1),
+                     self.avg_boredom, c="black")
+            ax1.plot(range(1, len(self.avg_boredom) + 1),
+                     self.avg_engagement, c="green")
+            ax1.plot(range(1, len(self.avg_boredom) + 1),
+                     self.avg_confusion, c="purple")
+            ax1.plot(range(1, len(self.avg_boredom) + 1),
+                     self.avg_frustration, c="red")
             sess_end = 0
             for i, time_stamp in enumerate(self.session_lengths):
                 if i == len(self.session_lengths) - 1:
@@ -191,16 +282,25 @@ class Inter_session():
         window.toolbars.pack(fill=BOTH)
 
     def get_emotion_plot(self, window, emo_ind):
+        """Create inter session emotion plot
+
+        Args:
+            self: vis_data class
+            window: window of gui_running
+            emo_ind(int): index of specific emotion
+        """
         checked_ids = []
-        # know how many people: counter = 0, first session: add num_ids; for other
-        # session: for encoding, check if already in, else counter++
-        for i, (ids, session) in enumerate(zip(self.sessions_data[0], self.sessions_data[1])):
+        # know how many people: counter = 0, first session: add num_ids;
+        # for other session: for encoding, check if already in, else counter++
+        for i, (ids, session) in enumerate(
+                zip(self.sessions_data[0], self.sessions_data[1])):
             self.session_lengths.append(np.array(session).shape[-1])
             if i == 0:
                 checked_ids.extend(ids)
             else:
                 for j, id in enumerate(ids):
-                    ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.6)
+                    ret = face_recognition.compare_faces(
+                        checked_ids, np.array(id), tolerance=0.3)
                     ret = [1 if x else 0 for x in ret]
                     # Person was not present in earlier lecture
                     if sum(ret) == 0:
@@ -209,43 +309,55 @@ class Inter_session():
                     elif sum(ret) == 1:
                         # print("shouldnt happen in this test")
                         pass
-                    # Person is similar to multiple persons in earlier lecture_names
+                    # Person is similar to multiple persons in earlier
+                    # lecture_names
                     else:
-                        raise Exception("Somehow people ended up as multiples in saved data. Contact Support.")
+                        raise Exception(
+                            "Somehow people ended up as multiples in saved data. Contact Support.")
 
         # Create array -1s of shape (num_people, all_timesteps)
-        all_person_data = np.ones(shape=(len(checked_ids), sum(self.session_lengths))) * -1
+        all_person_data = np.ones(
+            shape=(
+                len(checked_ids), sum(
+                    self.session_lengths))) * -1
         print(all_person_data.shape)
         # for session: put person @ its slot
         curr_time = 0
         last_person = 0
         checked_ids = []
-        for i, (ids, session) in enumerate(zip(self.sessions_data[0], self.sessions_data[1])):
+        for i, (ids, session) in enumerate(
+                zip(self.sessions_data[0], self.sessions_data[1])):
             session = np.array(session)
             if i == 0:
-                all_person_data[:session.shape[0], :session.shape[2]] = session[:, emo_ind, :]
+                all_person_data[:session.shape[0],
+                                :session.shape[2]] = session[:, emo_ind, :]
                 checked_ids.extend(ids)
                 last_person += session.shape[0]
             else:
                 for j, id in enumerate(ids):
-                    ret = face_recognition.compare_faces(checked_ids, np.array(id), tolerance=0.6)
+                    ret = face_recognition.compare_faces(
+                        checked_ids, np.array(id), tolerance=0.3)
                     ret = [1 if x else 0 for x in ret]
                     if sum(ret) == 0:
-                        all_person_data[last_person, curr_time:curr_time + session.shape[2]] = session[j, emo_ind, :]
+                        all_person_data[last_person, curr_time:curr_time +
+                                        session.shape[2]] = session[j, emo_ind, :]
                         checked_ids.append(id)
                         last_person += 1
                     elif sum(ret) == 1:
-                        all_person_data[ret.index(1), curr_time:curr_time + session.shape[2]] = session[j, emo_ind, :]
+                        all_person_data[ret.index(
+                            1), curr_time:curr_time + session.shape[2]] = session[j, emo_ind, :]
                         pass
                     else:
-                        raise Exception("Somehow people ended up as multiples in saved data. Contact Support.")
+                        raise Exception(
+                            "Somehow people ended up as multiples in saved data. Contact Support.")
             curr_time += session.shape[2]
         fig, ax0 = plt.subplots(1, 1)
         for i, person in enumerate(all_person_data):
             col = np.random.uniform(0.0, 1.0, 3)
             # make dashed line for timepoints where people where not present
             discontinued = [(i, x) for i, x in enumerate(person) if x != -1]
-            discontinued_i, discontinued_x = [list(x) for x in zip(*discontinued)]
+            discontinued_i, discontinued_x = [
+                list(x) for x in zip(*discontinued)]
             none_filled = [x if x != -1 else None for x in person]
             ax0.plot(discontinued_i, discontinued_x, color=col, linestyle=":")
             ax0.plot(none_filled, color=col)
@@ -256,5 +368,9 @@ class Inter_session():
             sess_end += time_stamp
             ax0.axvline(x=sess_end, linestyle="dashed")
         canvas = FigureCanvasTkAgg(fig, master=window.master)
+        window.toolbar = NavigationToolbar2Tk(canvas, window)
+        window.toolbar.update()
         window.widget = canvas.get_tk_widget()
         window.widget.pack(fill=BOTH)
+        window.toolbars = canvas._tkcanvas
+        window.toolbars.pack(fill=BOTH)
